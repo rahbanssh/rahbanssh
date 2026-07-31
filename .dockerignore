@@ -1,0 +1,9 @@
+.git
+.env
+data
+secrets
+letsencrypt
+backups
+install-summary.txt
+*.pyc
+__pycache__

@@ -1,0 +1,96 @@
+services:
+  proxy:
+    image: traefik:v3.5
+    container_name: ssh-vpn-traefik
+    restart: unless-stopped
+    command:
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.letsencrypt.acme.httpchallenge=true"
+      - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
+      - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
+    ports:
+      - "80:80/tcp"
+      - "443:443/tcp"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./letsencrypt:/letsencrypt
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - proxy
+
+  ssh-vpn:
+    build:
+      context: .
+    container_name: ssh-vpn-panel
+    restart: unless-stopped
+    ports:
+      - "${CUSTOMER_SSH_BIND:-0.0.0.0}:${CUSTOMER_SSH_PORT:-2222}:22/tcp"
+      - "127.0.0.1:${PANEL_HOST_PORT:-19080}:8080/tcp"
+    volumes:
+      - ./data:/data
+      - ./secrets/admin_password:/run/secrets/admin_password:ro
+    environment:
+      PANEL_ADMIN_USERNAME: "${PANEL_ADMIN_USERNAME:-admin}"
+      PANEL_ADMIN_PASSWORD_FILE: /run/secrets/admin_password
+      PANEL_TITLE: "${PANEL_TITLE:-Rahban · راه‌بان}"
+      PANEL_PUBLIC_URL: "https://${PANEL_PUBLIC_HOST}"
+      PANEL_REQUIRE_TOTP: "${PANEL_REQUIRE_TOTP:-false}"
+      CUSTOMER_PUBLIC_HOST: "${CUSTOMER_PUBLIC_HOST}"
+      CUSTOMER_PUBLIC_PORT: "${CUSTOMER_SSH_PORT:-2222}"
+      ACCOUNTING_INTERVAL_SECONDS: "2"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=ssh_vpn_proxy"
+      - "traefik.http.routers.ssh-vpn-panel-web.rule=Host(`${PANEL_PUBLIC_HOST}`)"
+      - "traefik.http.routers.ssh-vpn-panel-web.entrypoints=web"
+      - "traefik.http.routers.ssh-vpn-panel-web.middlewares=ssh-vpn-panel-https"
+      - "traefik.http.routers.ssh-vpn-panel-secure.rule=Host(`${PANEL_PUBLIC_HOST}`)"
+      - "traefik.http.routers.ssh-vpn-panel-secure.entrypoints=websecure"
+      - "traefik.http.routers.ssh-vpn-panel-secure.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.ssh-vpn-panel-secure.service=ssh-vpn-panel-svc"
+      - "traefik.http.middlewares.ssh-vpn-panel-https.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.ssh-vpn-panel-https.redirectscheme.permanent=true"
+      - "traefik.http.services.ssh-vpn-panel-svc.loadbalancer.server.port=8080"
+    cap_drop:
+      - ALL
+    cap_add:
+      - AUDIT_WRITE
+      - CHOWN
+      - DAC_OVERRIDE
+      - FOWNER
+      - KILL
+      - NET_BIND_SERVICE
+      - SETGID
+      - SETUID
+      - SYS_CHROOT
+    security_opt:
+      - no-new-privileges:true
+    tmpfs:
+      - /run:size=16m,mode=0755
+      - /tmp:size=32m,mode=1777
+    pids_limit: 512
+    mem_limit: 1g
+    cpus: 1.5
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/healthz', timeout=3)"]
+      interval: 15s
+      timeout: 5s
+      retries: 4
+      start_period: 20s
+    depends_on:
+      - proxy
+    networks:
+      - private
+      - proxy
+
+networks:
+  private:
+    name: ssh_vpn_private
+    driver: bridge
+  proxy:
+    name: ssh_vpn_proxy
+    driver: bridge

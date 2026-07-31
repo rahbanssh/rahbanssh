@@ -1,0 +1,30 @@
+# Runtime state and credentials
+.env
+.installed
+install-summary.txt
+data/
+secrets/
+letsencrypt/
+backups/
+*.db
+*.db-*
+*.sqlite*
+*.pem
+*.key
+*password*.txt
+*secret*.txt
+
+# Local SSH credentials
+id_*
+*.pub
+
+# Python, editors and OS metadata
+__pycache__/
+*.py[cod]
+.DS_Store
+.idea/
+.vscode/
+
+# Temporary files
+*.tmp
+*.log

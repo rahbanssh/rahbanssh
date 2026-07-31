@@ -1,0 +1,53 @@
+Port 22
+AddressFamily any
+ListenAddress 0.0.0.0
+ListenAddress ::
+
+HostKey /data/ssh/ssh_host_ed25519_key
+HostKey /data/ssh/ssh_host_rsa_key
+
+SyslogFacility AUTH
+LogLevel VERBOSE
+LoginGraceTime 30
+PermitRootLogin no
+StrictModes yes
+MaxAuthTries 4
+MaxSessions 1
+MaxStartups 20:30:60
+PerSourceMaxStartups 3
+
+PubkeyAuthentication no
+PasswordAuthentication yes
+PermitEmptyPasswords no
+KbdInteractiveAuthentication no
+UsePAM yes
+
+AllowAgentForwarding no
+AllowTcpForwarding yes
+AllowStreamLocalForwarding no
+GatewayPorts no
+X11Forwarding no
+PermitTTY no
+PermitTunnel no
+PermitUserEnvironment no
+PermitUserRC no
+TCPKeepAlive yes
+ClientAliveInterval 60
+ClientAliveCountMax 3
+Compression delayed
+UseDNS no
+PrintMotd no
+PrintLastLog no
+
+AllowGroups vpnusers
+
+Subsystem sftp internal-sftp
+
+Match Group vpnusers
+    ForceCommand /bin/false
+    AllowTcpForwarding yes
+    PermitOpen any
+    PermitListen none
+    PermitTTY no
+    X11Forwarding no
+    AllowAgentForwarding no
