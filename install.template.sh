@@ -157,8 +157,16 @@ if [[ "$CUSTOMER_SSH_PORT" == "22" ]]; then
   : > "$INSTALL_DIR/host-ssh-enabled-units"
   : > "$INSTALL_DIR/host-ssh-active-units"
   for unit in ssh.socket sshd.socket ssh.service sshd.service; do
-    systemctl is-enabled "$unit" >/dev/null 2>&1 && printf '%s\n' "$unit" >> "$INSTALL_DIR/host-ssh-enabled-units" || true
-    systemctl is-active "$unit" >/dev/null 2>&1 && printf '%s\n' "$unit" >> "$INSTALL_DIR/host-ssh-active-units" || true
+    canonical_unit="$(systemctl show "$unit" --property=Id --value 2>/dev/null || true)"
+    [[ -n "$canonical_unit" ]] || continue
+    if systemctl is-enabled "$canonical_unit" >/dev/null 2>&1 \
+       && ! grep -qxF "$canonical_unit" "$INSTALL_DIR/host-ssh-enabled-units"; then
+      printf '%s\n' "$canonical_unit" >> "$INSTALL_DIR/host-ssh-enabled-units"
+    fi
+    if systemctl is-active "$canonical_unit" >/dev/null 2>&1 \
+       && ! grep -qxF "$canonical_unit" "$INSTALL_DIR/host-ssh-active-units"; then
+      printf '%s\n' "$canonical_unit" >> "$INSTALL_DIR/host-ssh-active-units"
+    fi
   done
   chmod 600 "$INSTALL_DIR/host-ssh-enabled-units" "$INSTALL_DIR/host-ssh-active-units"
   host_ssh_moved=1
@@ -170,6 +178,10 @@ After=network.target
 
 [Service]
 Type=simple
+RuntimeDirectory=sshd
+RuntimeDirectoryMode=0755
+RuntimeDirectoryPreserve=yes
+ExecStartPre=/usr/bin/install -d -m 0755 /run/sshd
 ExecStart=${sshd_binary} -D -e -p ${MANAGEMENT_SSH_PORT} -o PidFile=/run/rahban-management-sshd.pid
 ExecReload=/bin/kill -HUP \$MAINPID
 KillMode=process
@@ -191,6 +203,7 @@ EOF
   systemctl stop ssh.socket sshd.socket >/dev/null 2>&1 || true
   systemctl stop ssh.service sshd.service >/dev/null 2>&1 || true
   systemctl disable ssh.socket sshd.socket ssh.service sshd.service >/dev/null 2>&1 || true
+  install -d -m 0755 /run/sshd
   for _ in {1..10}; do
     port_in_use 22 || break
     sleep 1
