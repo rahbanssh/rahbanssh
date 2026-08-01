@@ -236,6 +236,7 @@ def initialize_database() -> None:
                 telegram_username TEXT NOT NULL DEFAULT '',
                 display_name TEXT NOT NULL DEFAULT '',
                 assigned_reseller TEXT NOT NULL DEFAULT '',
+                registered_at TEXT NOT NULL DEFAULT '',
                 created_at TEXT NOT NULL,
                 updated_at TEXT NOT NULL,
                 PRIMARY KEY(bot_owner, telegram_id)
@@ -348,6 +349,18 @@ def initialize_database() -> None:
         if "deleted_at" not in plan_columns:
             conn.execute(
                 "ALTER TABLE service_plans ADD COLUMN deleted_at TEXT NOT NULL DEFAULT ''"
+            )
+        customer_columns = {
+            str(row["name"]) for row in conn.execute("PRAGMA table_info(telegram_customers)")
+        }
+        if "registered_at" not in customer_columns:
+            conn.execute(
+                "ALTER TABLE telegram_customers ADD COLUMN registered_at TEXT NOT NULL DEFAULT ''"
+            )
+            # Existing customers have already interacted with the bot, so preserve
+            # their access when introducing explicit registration for new users.
+            conn.execute(
+                "UPDATE telegram_customers SET registered_at=created_at WHERE registered_at=''"
             )
 
         existing = conn.execute(
@@ -1399,10 +1412,10 @@ def telegram_trial(owner: str, telegram_id: str) -> tuple[str, str, bool, str]:
     customer = telegram_customer(owner, telegram_id)
     if not customer:
         raise ValueError("ابتدا ربات را با /start فعال کنید")
-    agent = assigned_sales_agent(owner, telegram_id)
-    if not agent:
-        raise ValueError("در حال حاضر نماینده فعالی وجود ندارد")
-    agent_username = str(agent["username"])
+    seller = admin_record(owner)
+    if not seller or not bool(seller["enabled"]):
+        raise ValueError("در حال حاضر فروش سرویس غیرفعال است")
+    seller_username = str(seller["username"])
     username = telegram_ssh_username(telegram_id)
     with db() as conn:
         existing_user = conn.execute("SELECT * FROM users WHERE username=?", (username,)).fetchone()
@@ -1418,7 +1431,7 @@ def telegram_trial(owner: str, telegram_id: str) -> tuple[str, str, bool, str]:
     traffic_limit = 1024**3
     expires_at = (utcnow() + dt.timedelta(days=1)).replace(microsecond=0).isoformat()
     expires = dt.datetime.fromisoformat(expires_at).date().isoformat()
-    validate_reseller_allocation(agent_username, traffic_limit, expires)
+    validate_reseller_allocation(seller_username, traffic_limit, expires)
     with STATE_LOCK:
         customer_hash = create_unix_user(username, password)
         try:
@@ -1432,7 +1445,7 @@ def telegram_trial(owner: str, telegram_id: str) -> tuple[str, str, bool, str]:
                     VALUES(?,?,?,?,1,1,?,?,?,?,?,?,?,?)
                     """,
                     (username, traffic_limit, expires, expires_at, "Telegram 1-day trial",
-                     customer_hash, encrypt_credential(password), agent_username, "telegram",
+                     customer_hash, encrypt_credential(password), seller_username, "telegram",
                      telegram_id, now, now),
                 )
                 conn.execute(
@@ -1444,34 +1457,53 @@ def telegram_trial(owner: str, telegram_id: str) -> tuple[str, str, bool, str]:
             delete_unix_user(username)
             raise
     audit(f"telegram:{owner}", "trial.create", username, telegram_id)
-    return username, password, True, agent_username
+    return username, password, True, seller_username
+
+
+def telegram_registration_menu() -> str:
+    return json.dumps({"inline_keyboard": [[
+        {"text": "✅ ثبت‌نام", "callback_data": "register"},
+    ]]}, ensure_ascii=False)
 
 
 def telegram_menu() -> str:
     return json.dumps({"inline_keyboard": [
         [
-            {"text": "🎁 دریافت اکانت و کانفیگ", "callback_data": "get"},
+            {"text": "🎁 دریافت تست رایگان", "callback_data": "trial"},
         ],
         [
-            {"text": "👤 حساب من", "callback_data": "account"},
-            {"text": "🧑‍💼 نماینده من", "callback_data": "agent"},
+            {"text": "🛒 خرید VPN", "callback_data": "plans"},
         ],
         [
-            {"text": "🔑 تغییر رمز VPN", "callback_data": "password"},
+            {"text": "📊 حجم باقی‌مانده سرویس", "callback_data": "account"},
         ],
         [
-            {"text": "🛍 نمایندگان فعال", "callback_data": "agents"},
-            {"text": "📈 درخواست پنل فروش", "callback_data": "reseller"},
+            {"text": "☎️ ارتباط با ما", "callback_data": "contact"},
         ],
         [
-            {"text": "🧾 پلن‌های فروش", "callback_data": "plans"},
-            {"text": "📲 نرم‌افزارهای اتصال", "callback_data": "clients"},
-        ],
-        [
-            {"text": "☎️ تماس با مدیر", "callback_data": "contact"},
-            {"text": "❓ راهنما", "callback_data": "help"},
+            {"text": "📖 راهنما و نرم‌افزارهای اتصال", "callback_data": "help"},
         ],
     ]}, ensure_ascii=False)
+
+
+def telegram_help_text() -> str:
+    return (
+        "📖 راهنمای استفاده از سرویس\n\n"
+        "۱. برای دریافت سرویس آزمایشی، «دریافت تست رایگان» را بزنید.\n"
+        "۲. برای مشاهده پلن‌ها و ثبت سفارش، «خرید VPN» را انتخاب کنید.\n"
+        "۳. برای دیدن مصرف، حجم باقی‌مانده و تاریخ انقضا، «حجم باقی‌مانده سرویس» را بزنید.\n"
+        "۴. برای پشتیبانی، از «ارتباط با ما» استفاده کنید.\n\n"
+        "📲 نرم‌افزارهای پیشنهادی\n\n"
+        "Android — NPV Tunnel:\n"
+        "https://play.google.com/store/apps/details?id=com.napsternetlabs.napsternetv\n\n"
+        "iPhone / iPad — NPV Tunnel:\n"
+        "https://apps.apple.com/us/app/npv-tunnel/id1629465476\n\n"
+        "Windows — NetMod:\n"
+        "https://sourceforge.net/projects/netmodhttp/files/Setup/\n\n"
+        "Windows — Nekoray:\n"
+        "https://github.com/MatsuriDayo/nekoray/releases\n\n"
+        "برای واردکردن کانفیگ، متن npvt-ssh:// را کامل Copy کنید و داخل NPV Tunnel وارد کنید."
+    )
 
 
 def telegram_contact_keyboard() -> str:
@@ -1571,18 +1603,15 @@ def handle_telegram_update(owner: sqlite3.Row, token: str, update: dict[str, obj
             return
         phone = str(shared_contact.get("phone_number") or "")[:32]
         customer = upsert_telegram_customer(bot_owner, telegram_id, sender, phone)
-        with db() as conn:
-            conn.execute(
-                "UPDATE reseller_applications SET phone=?,updated_at=? WHERE bot_owner=? AND telegram_id=? AND status='pending'",
-                (phone,iso_now(),bot_owner,telegram_id),
+        if customer["registered_at"]:
+            telegram_reply(token, chat_id, "✅ شماره تماس شما ثبت شد.", menu=True)
+        else:
+            telegram_reply(
+                token,
+                chat_id,
+                "شماره تماس دریافت شد. برای ادامه ابتدا ثبت‌نام کنید.",
+                reply_markup=telegram_registration_menu(),
             )
-        agent = assigned_sales_agent(bot_owner, telegram_id)
-        agent_label = str(agent["public_name"] or agent["username"]) if agent else "در حال تخصیص"
-        telegram_reply(
-            token, chat_id,
-            f"✅ شماره تماس شما برای درخواست پنل فروش ثبت شد.\n\n🆔 نام کاربری SSH از Telegram ID عددی شما ساخته می‌شود.\n🧑‍💼 نماینده ثابت شما: {agent_label}",
-            menu=True,
-        )
         return
     text_message = str(message.get("text") or "").strip()
     if not text_message and not callback_command:
@@ -1594,6 +1623,55 @@ def handle_telegram_update(owner: sqlite3.Row, token: str, update: dict[str, obj
     elif command == "/start" and len(text_message.split()) > 1 and text_message.split()[1].lower() == "plans":
         command = "/plans"
     contact = str(owner["contact_text"] or "اطلاعات تماس مدیر هنوز ثبت نشده است.")
+    registered = bool(str(customer["registered_at"] or ""))
+    if command == "/start":
+        if not registered:
+            telegram_reply(
+                token,
+                chat_id,
+                f"به {panel_title()} خوش آمدید 🌿\n\nبرای استفاده از خدمات، ابتدا روی دکمه ثبت‌نام بزنید.",
+                reply_markup=telegram_registration_menu(),
+            )
+        else:
+            telegram_reply(
+                token,
+                chat_id,
+                f"به {panel_title()} خوش آمدید 🌿\n\nخدمت موردنظر خود را انتخاب کنید:",
+                menu=True,
+            )
+        return
+    if command == "/register":
+        if not registered:
+            registered_at = iso_now()
+            with db() as conn:
+                conn.execute(
+                    "UPDATE telegram_customers SET registered_at=?,updated_at=? WHERE bot_owner=? AND telegram_id=?",
+                    (registered_at, registered_at, bot_owner, telegram_id),
+                )
+            audit(f"telegram:{bot_owner}", "customer.register", telegram_id)
+        telegram_reply(
+            token,
+            chat_id,
+            "✅ ثبت‌نام شما با موفقیت انجام شد.\n\nاکنون خدمت موردنظر خود را انتخاب کنید:",
+            menu=True,
+        )
+        return
+    if not registered:
+        telegram_reply(
+            token,
+            chat_id,
+            "برای استفاده از خدمات، ابتدا ثبت‌نام کنید.",
+            reply_markup=telegram_registration_menu(),
+        )
+        return
+    if command in ("/agents", "/agent", "/reseller") or command.startswith("/pick:"):
+        telegram_reply(
+            token,
+            chat_id,
+            "این گزینه دیگر در ربات مشتریان نمایش داده نمی‌شود. لطفاً از منوی ساده زیر استفاده کنید.",
+            menu=True,
+        )
+        return
     if command == "/cancel":
         clear_telegram_pending_action(bot_owner, telegram_id)
         telegram_reply(token, chat_id, "عملیات لغو شد.", menu=True)
@@ -1640,46 +1718,28 @@ def handle_telegram_update(owner: sqlite3.Row, token: str, update: dict[str, obj
             telegram_reply(token, chat_id, npv_tunnel_config(str(user["username"]), password))
             telegram_reply(token, chat_id, "منوی راه‌بان", menu=True)
             return
-    if command in ("/start", "/help"):
-        text_value = (
-            f"به {panel_title()} خوش آمدید 🌿\n\n"
-            "از دکمه‌های زیر استفاده کنید:\n"
-            "• دریافت اکانت و کانفیگ: ساخت یا نمایش دوباره حساب\n"
-            "• حساب من: رمز، IP، پورت، مصرف، مانده و انقضا\n"
-            "• نماینده من: فروشنده‌ای که همیشه به شما متصل است\n"
-            "• درخواست پنل فروش: ورود به شبکه نمایندگان"
-        )
-        telegram_reply(token, chat_id, text_value, menu=True)
+    if command == "/help":
+        telegram_reply(token, chat_id, telegram_help_text(), menu=True)
         return
     elif command == "/contact":
         telegram_reply(token, chat_id, "☎️ راه ارتباط با مدیر:\n\n" + contact, menu=True)
         return
     elif command == "/clients":
-        telegram_reply(token, chat_id,
-            "📲 نرم‌افزارهای اتصال\n\n"
-            "Android — NPV Tunnel:\nhttps://play.google.com/store/apps/details?id=com.napsternetlabs.napsternetv\n\n"
-            "iPhone / iPad — NPV Tunnel:\nhttps://apps.apple.com/us/app/npv-tunnel/id1629465476\n\n"
-            "Windows / macOS / Android / iOS — Termius:\nhttps://termius.com/download\n\n"
-            "Windows — OpenSSH رسمی مایکروسافت:\nhttps://learn.microsoft.com/en-us/windows-server/administration/openssh/openssh-install-first-use\n\n"
-            "Windows — PuTTY:\nhttps://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html"
-            "\n\nWindows — NetMod (پشتیبانی SSH):\nhttps://sourceforge.net/projects/netmodhttp/files/Setup/\n\n"
-            "Windows — Nekoray قدیمی و آرشیوشده:\nhttps://github.com/MatsuriDayo/nekoray/releases\n\n"
-            "جایگزین فعال Nekoray با پشتیبانی SSH — Throne:\nhttps://github.com/throneproj/Throne/releases",
-            menu=True)
+        telegram_reply(token, chat_id, telegram_help_text(), menu=True)
         return
     elif command == "/plans":
-        agent = assigned_sales_agent(bot_owner, telegram_id)
-        if not agent:
-            telegram_reply(token, chat_id, "نماینده فعالی برای نمایش پلن‌ها وجود ندارد.", menu=True)
+        seller = admin_record(bot_owner)
+        if not seller or not bool(seller["enabled"]):
+            telegram_reply(token, chat_id, "در حال حاضر فروش سرویس غیرفعال است.", menu=True)
             return
-        plans = plans_for_agent(str(agent["username"]))
+        plans = plans_for_agent(bot_owner)
         if not plans:
-            telegram_reply(token, chat_id, "نماینده شما هنوز پلن فروشی تعریف نکرده است.", menu=True)
+            telegram_reply(token, chat_id, "در حال حاضر پلن فروشی ثبت نشده است.\n\n" + contact, menu=True)
             return
-        lines = [f"🧾 پلن‌های {str(agent['public_name'] or agent['username'])}:"]
+        lines = ["🛒 پلن‌های خرید VPN:"]
         for plan in plans:
             description = f"\n  توضیحات: {plan['description']}" if plan["description"] else ""
-            lines.append(f"\n• {plan['name']}\n  مدت: {human_duration(int(plan['duration_minutes']))}\n  حجم: {human_bytes(int(plan['traffic_bytes']))}\n  اتصال: {int(plan['max_connections'])}\n  قیمت: {str(plan['price_label'] or 'تماس با نماینده')}{description}")
+            lines.append(f"\n• {plan['name']}\n  مدت: {human_duration(int(plan['duration_minutes']))}\n  حجم: {human_bytes(int(plan['traffic_bytes']))}\n  اتصال: {int(plan['max_connections'])}\n  قیمت: {str(plan['price_label'] or 'تماس با پشتیبانی')}{description}")
         telegram_reply(token, chat_id, "\n".join(lines), reply_markup=telegram_plans_keyboard(plans))
         return
     elif command.startswith("/buy:"):
@@ -1688,11 +1748,11 @@ def handle_telegram_update(owner: sqlite3.Row, token: str, update: dict[str, obj
         except ValueError:
             telegram_reply(token, chat_id, "پلن معتبر نیست.", menu=True)
             return
-        agent = assigned_sales_agent(bot_owner, telegram_id)
+        seller = admin_record(bot_owner)
         new_request = False
         with db() as conn:
             plan = conn.execute("SELECT * FROM service_plans WHERE id=? AND enabled=1 AND deleted_at=''", (plan_id,)).fetchone()
-            if not agent or not plan or str(plan["owner_username"]) not in admin_ancestors(str(agent["username"])):
+            if not seller or not plan or str(plan["owner_username"]) != bot_owner:
                 telegram_reply(token, chat_id, "این پلن دیگر فعال نیست.", menu=True)
                 return
             prior = conn.execute("SELECT id FROM purchase_requests WHERE telegram_id=? AND plan_id=? AND status='pending'", (telegram_id, plan_id)).fetchone()
@@ -1701,11 +1761,10 @@ def handle_telegram_update(owner: sqlite3.Row, token: str, update: dict[str, obj
             else:
                 now = iso_now()
                 request_id = int(conn.execute("""INSERT INTO purchase_requests(bot_owner,telegram_id,assigned_reseller,plan_id,status,created_at,updated_at)
-                    VALUES(?,?,?,?, 'pending',?,?)""", (bot_owner,telegram_id,agent["username"],plan_id,now,now)).lastrowid)
+                    VALUES(?,?,?,?, 'pending',?,?)""", (bot_owner,telegram_id,bot_owner,plan_id,now,now)).lastrowid)
                 new_request = True
-        agent_label = str(agent["public_name"] or agent["username"])
-        telegram_reply(token, chat_id, f"✅ درخواست خرید شماره {request_id} برای پلن «{plan['name']}» ثبت شد.\n\n🧑‍💼 نماینده ثابت: {agent_label}\n👤 نام کاربری پنل نماینده: {agent['username']}\n💳 هماهنگی پرداخت و فعال‌سازی:\n{str(agent['contact_text'] or 'اطلاعات تماس نماینده ثبت نشده است.')}", menu=True)
-        notification_id = str(agent["notification_telegram_id"] or "")
+        telegram_reply(token, chat_id, f"✅ درخواست خرید شماره {request_id} برای پلن «{plan['name']}» ثبت شد.\n\nبرای پرداخت و فعال‌سازی با پشتیبانی ارتباط بگیرید:\n{contact}", menu=True)
+        notification_id = str(seller["notification_telegram_id"] or "")
         if new_request and notification_id:
             customer_name = str(customer["display_name"] or "—")
             customer_username = str(customer["telegram_username"] or "")
@@ -1716,9 +1775,9 @@ def handle_telegram_update(owner: sqlite3.Row, token: str, update: dict[str, obj
                     notification_id,
                     f"🔔 سفارش جدید برای شما\n\nشماره سفارش: #{request_id}\nمشتری: {customer_name}\nTelegram ID: {telegram_id}\nراه ارتباط: {contact_link}\n\nپلن: {plan['name']}\nمدت: {human_duration(int(plan['duration_minutes']))}\nحجم: {human_bytes(int(plan['traffic_bytes']))}\nاتصال هم‌زمان: {int(plan['max_connections'])}\nقیمت: {str(plan['price_label'] or 'توافقی')}\n\nبرای هماهنگی پرداخت با مشتری تماس بگیرید.\nپنل سفارش‌ها: {PANEL_PUBLIC_URL}/applications",
                 )
-                audit(f"telegram:{bot_owner}", "purchase.agent_notified", str(request_id), str(agent["username"]))
+                audit(f"telegram:{bot_owner}", "purchase.owner_notified", str(request_id), bot_owner)
             except Exception as exc:
-                audit(f"telegram:{bot_owner}", "purchase.agent_notify_failed", str(request_id), type(exc).__name__)
+                audit(f"telegram:{bot_owner}", "purchase.owner_notify_failed", str(request_id), type(exc).__name__)
         return
     elif command == "/agents":
         agents = active_sales_agents(bot_owner)
@@ -1765,10 +1824,8 @@ def handle_telegram_update(owner: sqlite3.Row, token: str, update: dict[str, obj
                 (bot_owner, telegram_id),
             ).fetchone()
             user = conn.execute("SELECT * FROM users WHERE username=?", (trial["ssh_username"],)).fetchone() if trial else None
-        agent = assigned_sales_agent(bot_owner, telegram_id)
-        agent_label = str(agent["public_name"] or agent["username"]) if agent else "—"
         if not user:
-            telegram_reply(token, chat_id, f"🆔 Telegram ID: {telegram_id}\nهنوز اکانتی ندارید.\n🧑‍💼 نماینده ثابت: {agent_label}", menu=True)
+            telegram_reply(token, chat_id, "هنوز سرویس فعالی ندارید.\n\nبرای شروع، دکمه «دریافت تست رایگان» یا «خرید VPN» را بزنید.", menu=True)
             return
         status, _ = user_status(user)
         limit_bytes = int(user["traffic_limit"])
@@ -1776,10 +1833,10 @@ def handle_telegram_update(owner: sqlite3.Row, token: str, update: dict[str, obj
         limit = human_bytes(limit_bytes) if limit_bytes else "نامحدود"
         remaining = human_bytes(max(0, limit_bytes - used_bytes)) if limit_bytes else "نامحدود"
         active_connections = len(user_processes().get(str(user["username"]), []))
-        password = decrypt_credential(str(user["credential_token"])) if user["credential_token"] else "برای دریافت رمز، از نماینده کانفیگ جدید بخواهید"
+        password = decrypt_credential(str(user["credential_token"])) if user["credential_token"] else "برای دریافت رمز با پشتیبانی تماس بگیرید"
         telegram_reply(
             token, chat_id,
-            f"👤 حساب من\n\n🆔 Telegram ID: {telegram_id}\nنام کاربری SSH: {user['username']}\nرمز عبور: {password}\nIP / Host: {CUSTOMER_PUBLIC_HOST}\nPort: {CUSTOMER_PUBLIC_PORT}\n\nوضعیت: {status}\nمصرف‌شده: {human_bytes(used_bytes)}\nحجم کل: {limit}\nباقی‌مانده: {remaining}\nانقضا (شمسی): {jalali_datetime(user['expires_at'] or user['expires_on'])}\nاتصال فعال: {active_connections} از {int(user['max_connections'])}\nآخرین IP: {user['last_ip'] or '—'}\nنماینده: {agent_label}",
+            f"📊 وضعیت سرویس من\n\nوضعیت: {status}\nحجم کل: {limit}\nمصرف‌شده: {human_bytes(used_bytes)}\nحجم باقی‌مانده: {remaining}\nانقضا (شمسی): {jalali_datetime(user['expires_at'] or user['expires_on'])}\nاتصال فعال: {active_connections} از {int(user['max_connections'])}\n\n👤 نام کاربری: {user['username']}\n🔑 رمز عبور: {password}\n🌐 سرور: {CUSTOMER_PUBLIC_HOST}\n🔌 پورت: {CUSTOMER_PUBLIC_PORT}",
             menu=True,
         )
         return
@@ -1827,11 +1884,11 @@ def handle_telegram_update(owner: sqlite3.Row, token: str, update: dict[str, obj
             return
         else:
             try:
-                username, password, created, agent_username = telegram_trial(bot_owner, telegram_id)
+                username, password, created, _seller_username = telegram_trial(bot_owner, telegram_id)
                 if created:
                     telegram_reply(
                         token, chat_id,
-                        f"✅ تست شما ساخته شد.\n\n👤 نام کاربری: {username}\n🧑‍💼 نماینده: {agent_username}\n⏳ اعتبار: یک روز\n📦 حجم: ۱ گیگابایت\n👥 اتصال هم‌زمان: ۱\n\nکانفیگ در پیام بعدی ارسال می‌شود؛ روی آن نگه دارید و Copy را بزنید.",
+                        f"✅ تست رایگان شما فعال شد.\n\n👤 نام کاربری: {username}\n⏳ اعتبار: یک روز\n📦 حجم: ۱ گیگابایت\n👥 اتصال هم‌زمان: ۱\n\nکانفیگ در پیام بعدی ارسال می‌شود؛ روی آن نگه دارید و Copy را بزنید.",
                     )
                 # Keep the configuration in its own message with no prefix,
                 # suffix, formatting or contact text so mobile clients can copy it cleanly.
@@ -1866,22 +1923,18 @@ def telegram_loop() -> None:
                     token = decrypt_credential(str(owner["telegram_token"]))
                     if name not in announced:
                         telegram_api(token, "setMyCommands", {"commands": json.dumps([
-                            {"command":"get","description":"دریافت اکانت و کانفیگ"},
-                            {"command":"account","description":"مشاهده وضعیت حساب من"},
-                            {"command":"password","description":"تغییر رمز VPN"},
-                            {"command":"cancel","description":"لغو تغییر رمز"},
-                            {"command":"agents","description":"نمایش نمایندگان فعال"},
-                            {"command":"plans","description":"نمایش پلن‌های نماینده من"},
-                            {"command":"clients","description":"دانلود نرم‌افزارهای اتصال"},
-                            {"command":"reseller","description":"درخواست پنل فروش"},
-                            {"command":"contact","description":"تماس با مدیر و پشتیبانی"},
-                            {"command":"help","description":"نمایش راهنما و منوی دکمه‌ای"},
+                            {"command":"register","description":"ثبت‌نام در ربات"},
+                            {"command":"trial","description":"دریافت تست رایگان"},
+                            {"command":"plans","description":"خرید VPN و مشاهده پلن‌ها"},
+                            {"command":"account","description":"مشاهده حجم باقی‌مانده سرویس"},
+                            {"command":"contact","description":"ارتباط با پشتیبانی"},
+                            {"command":"help","description":"راهنما و نرم‌افزارهای اتصال"},
                         ], ensure_ascii=False)})
                         telegram_api(token, "setMyDescription", {
-                            "description": f"{panel_title()} — دریافت تست یک‌روزه، کانفیگ و ارتباط با پشتیبانی"
+                            "description": f"{panel_title()} — ثبت‌نام، تست رایگان، خرید VPN و پشتیبانی"
                         })
                         telegram_api(token, "setMyShortDescription", {
-                            "short_description": "دریافت تست، کانفیگ و پشتیبانی راه‌بان"
+                            "short_description": "تست رایگان، خرید VPN و پشتیبانی"
                         })
                         announced.add(name)
                     with db() as conn:
