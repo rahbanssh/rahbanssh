@@ -1,76 +1,63 @@
 <!doctype html>
-<html lang="en" dir="ltr">
+<html lang="fa" dir="rtl">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Rahban SSH — Open-Source SSH VPN & Reseller Panel</title>
-  <meta name="description" content="Deploy a self-hosted SSH tunnel panel with Docker isolation, reseller accounting, traffic limits, Telegram sales tools and paste-ready NPV configurations.">
-  <meta name="keywords" content="SSH VPN panel, SSH reseller panel, Docker SSH panel, NPV Tunnel, traffic accounting, Telegram SSH bot, Rahban SSH">
+  <title>راه‌بان SSH — پنل متن‌باز تونل SSH و نمایندگان فروش</title>
+  <meta name="description" content="پنل فارسی و متن‌باز مدیریت تونل SSH با ایزوله‌سازی Docker، حسابداری حجم، شبکه نمایندگان، ربات تلگرام و کانفیگ آماده NPV Tunnel.">
+  <meta name="keywords" content="پنل SSH، پنل فروش SSH، پنل VPN، تونل SSH، راه‌بان SSH، NPV Tunnel، ربات تلگرام، مدیریت حجم">
   <meta name="theme-color" content="#06110f">
   <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
   <link rel="canonical" href="https://rahbanssh.github.io/rahbanssh/">
-  <link rel="alternate" hreflang="en" href="https://rahbanssh.github.io/rahbanssh/">
-  <link rel="alternate" hreflang="fa" href="https://rahbanssh.github.io/rahbanssh/fa/">
+  <link rel="alternate" hreflang="en" href="https://rahbanssh.github.io/rahbanssh/en/">
+  <link rel="alternate" hreflang="fa" href="https://rahbanssh.github.io/rahbanssh/">
   <link rel="alternate" hreflang="x-default" href="https://rahbanssh.github.io/rahbanssh/">
+  <link rel="preload" href="./assets/fonts/Vazirmatn-Variable.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="./assets/styles.css">
   <link rel="manifest" href="./manifest.webmanifest">
   <meta property="og:type" content="website">
-  <meta property="og:site_name" content="Rahban SSH">
-  <meta property="og:title" content="Rahban SSH — SSH access, governed.">
-  <meta property="og:description" content="An open-source, Docker-isolated SSH tunnel and reseller panel with traffic accounting, Telegram tools and one-line deployment.">
+  <meta property="og:site_name" content="راه‌بان SSH">
+  <meta property="og:title" content="راه‌بان SSH — دسترسی SSH، تحت کنترل">
+  <meta property="og:description" content="پنل متن‌باز و ایزوله Docker برای مدیریت تونل SSH، نمایندگان فروش، مصرف و کانفیگ‌های آماده.">
   <meta property="og:url" content="https://rahbanssh.github.io/rahbanssh/">
+  <meta property="og:locale" content="fa_IR">
   <meta property="og:image" content="https://rahbanssh.github.io/rahbanssh/assets/og.png">
-  <meta property="og:image:alt" content="Rahban SSH dashboard and separate port 22 customer and port 2222 management routes">
+  <meta property="og:image:alt" content="داشبورد راه‌بان و مسیرهای جداگانه پورت ۲۲ مشتری و پورت ۲۲۲۲ مدیریت">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Rahban SSH — SSH access, governed.">
-  <meta name="twitter:description" content="Open-source SSH tunnel and reseller management, isolated in Docker.">
+  <meta name="twitter:title" content="راه‌بان SSH — دسترسی SSH، تحت کنترل">
+  <meta name="twitter:description" content="پنل فارسی و متن‌باز تونل SSH و مدیریت نمایندگان فروش.">
   <meta name="twitter:image" content="https://rahbanssh.github.io/rahbanssh/assets/og.png">
-  <meta name="twitter:image:alt" content="Rahban SSH — SSH access, governed">
+  <meta name="twitter:image:alt" content="راه‌بان SSH — دسترسی SSH، تحت کنترل">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "SoftwareApplication",
-        "@id": "https://rahbanssh.github.io/rahbanssh/#software",
-        "name": "Rahban SSH",
-        "alternateName": "راه‌بان SSH",
-        "url": "https://rahbanssh.github.io/rahbanssh/",
-        "downloadUrl": "https://github.com/rahbanssh/rahbanssh",
-        "codeRepository": "https://github.com/rahbanssh/rahbanssh",
-        "applicationCategory": "NetworkApplication",
-        "applicationSubCategory": "SSH tunnel and reseller management panel",
-        "operatingSystem": "Linux server (Ubuntu, Debian, Fedora)",
-        "softwareRequirements": "Docker-compatible public Linux VPS",
-        "license": "https://opensource.org/license/mit",
-        "isAccessibleForFree": true,
-        "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"},
-        "description": "A self-hosted SSH tunnel account and reseller panel with Docker isolation, traffic accounting, expiry controls, Telegram sales tools and NPV configurations.",
-        "inLanguage": ["en", "fa"]
-      },
-      {
-        "@type": "FAQPage",
-        "mainEntity": [
-          {"@type": "Question", "name": "Does Rahban SSH modify VPS management access?", "acceptedAnswer": {"@type": "Answer", "text": "For the default port layout, customer SSH uses port 22 and VPS management moves to port 2222. The installer prints the exact future management command and provides rollback."}},
-          {"@type": "Question", "name": "Is Rahban SSH a full UDP VPN?", "acceptedAnswer": {"@type": "Answer", "text": "Rahban is an SSH TCP tunneling platform. It supports SSH forwarding and SOCKS5 traffic; it does not claim native full-UDP VPN behavior."}},
-          {"@type": "Question", "name": "Does the project contain a backdoor or commission system?", "acceptedAnswer": {"@type": "Answer", "text": "No. Rahban SSH is MIT-licensed and does not include creator access, credential reporting, a commission mechanism or a hidden remote-access account."}}
-        ]
-      }
-    ]
+    "@type": "SoftwareApplication",
+    "name": "راه‌بان SSH",
+    "alternateName": "Rahban SSH",
+    "url": "https://rahbanssh.github.io/rahbanssh/",
+    "downloadUrl": "https://github.com/rahbanssh/rahbanssh",
+    "codeRepository": "https://github.com/rahbanssh/rahbanssh",
+    "applicationCategory": "NetworkApplication",
+    "operatingSystem": "Linux server (Ubuntu, Debian, Fedora)",
+    "license": "https://opensource.org/license/mit",
+    "isAccessibleForFree": true,
+    "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"},
+    "description": "پنل فارسی مدیریت حساب‌های تونل SSH، نمایندگان فروش، حجم و تاریخ انقضا با ایزوله‌سازی Docker.",
+    "inLanguage": ["fa", "en"]
   }
   </script>
 </head>
-<body>
-  <a class="skip-link" href="#main">Skip to content</a>
+<body dir="rtl">
+  <a class="skip-link" href="#main">رفتن به محتوای اصلی</a>
   <header class="site-header">
-    <nav class="nav shell" aria-label="Primary navigation">
-      <a class="brand" href="./" aria-label="Rahban SSH home"><span class="brand-mark">R</span><span>Rahban SSH</span></a>
+    <nav class="nav shell" aria-label="منوی اصلی">
+      <a class="brand" href="./" aria-label="صفحه اصلی راه‌بان SSH"><span class="brand-mark">R</span><span>راه‌بان SSH</span></a>
       <div class="nav-links">
-        <a href="#features">Features</a><a href="#architecture">Architecture</a><a href="#install">Install</a><a href="#faq">FAQ</a>
-        <a class="github-nav" href="https://github.com/rahbanssh/rahbanssh">GitHub</a>
-        <a class="language" href="./fa/" lang="fa" hreflang="fa">فارسی</a>
+        <a href="#features">امکانات</a><a href="#architecture">معماری</a><a href="#install">نصب</a><a href="#faq">پرسش‌ها</a>
+        <a class="github-nav" href="https://github.com/rahbanssh/rahbanssh">گیت‌هاب</a>
+        <a class="language" href="./en/" lang="en" hreflang="en">English</a>
       </div>
     </nav>
   </header>
@@ -79,29 +66,29 @@
     <section class="hero">
       <div class="hero-grid shell">
         <div class="hero-copy">
-          <span class="eyebrow">Open source · Docker isolated</span>
-          <h1>SSH access,<br><em>governed.</em></h1>
-          <p>Build, allocate and observe SSH tunnel accounts from one responsive panel—with reseller credit, live usage, expiry controls, Telegram sales tools and paste-ready NPV configurations.</p>
+          <span class="eyebrow">متن‌باز · ایزوله در Docker</span>
+          <h1>دسترسی SSH،<br><em>تحت کنترل.</em></h1>
+          <p>حساب‌های تونل SSH را از یک پنل واکنش‌گرا بسازید، واگذار کنید و زیر نظر بگیرید؛ همراه با اعتبار نمایندگان، مصرف زنده، انقضا، ابزار فروش تلگرامی و کانفیگ آماده NPV.</p>
           <div class="cta-row">
-            <a class="button" href="#install">Deploy Rahban <span aria-hidden="true">↘</span></a>
-            <a class="button secondary" href="https://github.com/rahbanssh/rahbanssh">View source</a>
+            <a class="button" href="#install">نصب راه‌بان <span aria-hidden="true">↙</span></a>
+            <a class="button secondary" href="https://github.com/rahbanssh/rahbanssh">مشاهده کد</a>
           </div>
-          <div class="microcopy"><span>MIT licensed</span><span>Zero-state install</span><span>Persian-first UI</span></div>
+          <div class="microcopy"><span>مجوز MIT</span><span>نصب با دیتابیس خالی</span><span>رابط فارسی</span></div>
         </div>
-        <div class="product-window" aria-label="Illustration of the Rahban owner dashboard">
+        <div class="product-window" aria-label="نمایی از داشبورد مالک راه‌بان">
           <div class="window-inner">
-            <div class="window-bar"><span class="dots"><i></i><i></i><i></i></span><span>owner / dashboard</span></div>
+            <div class="window-bar"><span class="dots"><i></i><i></i><i></i></span><span>مالک / داشبورد</span></div>
             <div class="dashboard">
               <div class="metric-grid">
-                <div class="metric"><small>Active users</small><strong>184</strong></div>
-                <div class="metric"><small>Online now</small><strong>37</strong></div>
-                <div class="metric"><small>Resellers</small><strong>12</strong></div>
+                <div class="metric"><small>کاربران فعال</small><strong>۱۸۴</strong></div>
+                <div class="metric"><small>آنلاین اکنون</small><strong>۳۷</strong></div>
+                <div class="metric"><small>نمایندگان</small><strong>۱۲</strong></div>
               </div>
               <div class="activity">
-                <div class="activity-head"><span>account</span><span>status</span><span>usage</span></div>
-                <div class="activity-row"><span>user_1048</span><span class="status">active</span><span class="usage"><i style="--usage:61%"></i></span></div>
-                <div class="activity-row"><span>user_2093</span><span class="status">active</span><span class="usage"><i style="--usage:28%"></i></span></div>
-                <div class="activity-row"><span>user_3770</span><span class="status">active</span><span class="usage"><i style="--usage:82%"></i></span></div>
+                <div class="activity-head"><span>حساب</span><span>وضعیت</span><span>مصرف</span></div>
+                <div class="activity-row"><span>user_1048</span><span class="status">فعال</span><span class="usage"><i style="--usage:61%"></i></span></div>
+                <div class="activity-row"><span>user_2093</span><span class="status">فعال</span><span class="usage"><i style="--usage:28%"></i></span></div>
+                <div class="activity-row"><span>user_3770</span><span class="status">فعال</span><span class="usage"><i style="--usage:82%"></i></span></div>
               </div>
             </div>
           </div>
@@ -109,53 +96,53 @@
       </div>
     </section>
 
-    <section class="trust" aria-label="Project highlights">
+    <section class="trust" aria-label="ویژگی‌های پروژه">
       <div class="trust-grid shell">
-        <div class="trust-item"><strong>Isolated</strong><span>Customer users stay inside Docker</span></div>
-        <div class="trust-item"><strong>Delegated</strong><span>Nested reseller traffic credit</span></div>
-        <div class="trust-item"><strong>Observable</strong><span>Usage, sessions and last IP</span></div>
-        <div class="trust-item"><strong>Portable</strong><span>One-line Linux VPS deployment</span></div>
+        <div class="trust-item"><strong>ایزوله</strong><span>کاربران مشتری داخل Docker می‌مانند</span></div>
+        <div class="trust-item"><strong>قابل‌واگذاری</strong><span>اعتبار چندسطحی نمایندگان</span></div>
+        <div class="trust-item"><strong>قابل‌مشاهده</strong><span>مصرف، اتصال و آخرین IP</span></div>
+        <div class="trust-item"><strong>قابل‌انتقال</strong><span>نصب یک‌خطی روی VPS لینوکس</span></div>
       </div>
     </section>
 
     <section class="section paper" id="features">
       <div class="shell">
-        <div class="section-head"><div><div class="kicker">Designed for operators</div><h2>From one account to a sales network.</h2></div><p>Rahban joins account lifecycle, reseller allocation and customer-ready connection details without exposing host users or requiring a heavyweight control plane.</p></div>
+        <div class="section-head"><div><div class="kicker">ساخته‌شده برای اپراتورها</div><h2>از یک حساب تا شبکه کامل فروش.</h2></div><p>راه‌بان چرخه عمر حساب، اعتبار نمایندگان و اطلاعات آماده مشتری را کنار هم می‌آورد؛ بدون اینکه کاربران سیستم اصلی سرور را در اختیار مشتری قرار دهد.</p></div>
         <div class="feature-grid">
-          <article class="feature"><span class="feature-index">01 / CONTROL</span><div><h3>Account lifecycle</h3><p>Create, disable, extend, disconnect or regenerate accounts. Enforce quota, exact expiry and 1–100 simultaneous connections.</p></div></article>
-          <article class="feature"><span class="feature-index">02 / ACCOUNTING</span><div><h3>Traffic visibility</h3><p>See live sessions, used bytes, remaining allowance and last-seen IP with automated quota enforcement.</p></div></article>
-          <article class="feature"><span class="feature-index">03 / RESELLERS</span><div><h3>Delegated credit</h3><p>Allocate traffic and expiry to resellers and child resellers while preventing a branch from exceeding its parent.</p></div></article>
-          <article class="feature"><span class="feature-index">04 / DELIVERY</span><div><h3>Paste-ready access</h3><p>Copy host, port, username, password, plain SSH details or a complete <code>npvt-ssh://</code> import string.</p></div></article>
-          <article class="feature"><span class="feature-index">05 / SALES</span><div><h3>Plans and Telegram</h3><p>Publish editable service plans, assign permanent agents and optionally receive orders through a reseller’s Telegram bot.</p></div></article>
-          <article class="feature"><span class="feature-index">06 / OPERATIONS</span><div><h3>Audit and recovery</h3><p>Track administrative actions, create protected backups and use the generated rollback path when an installation must be stopped.</p></div></article>
+          <article class="feature"><span class="feature-index">۰۱ / کنترل</span><div><h3>چرخه عمر حساب</h3><p>ساخت، غیرفعال‌سازی، تمدید، قطع اتصال یا تولید رمز جدید؛ همراه با حجم، انقضای دقیق و ۱ تا ۱۰۰ اتصال هم‌زمان.</p></div></article>
+          <article class="feature"><span class="feature-index">۰۲ / حسابداری</span><div><h3>نمایش مصرف</h3><p>اتصال‌های زنده، حجم مصرف‌شده، اعتبار باقی‌مانده و آخرین IP را ببینید و سقف مصرف را خودکار اعمال کنید.</p></div></article>
+          <article class="feature"><span class="feature-index">۰۳ / نمایندگان</span><div><h3>اعتبار قابل‌واگذاری</h3><p>برای نماینده و زیرنماینده حجم و انقضا تعیین کنید؛ هیچ شاخه‌ای نمی‌تواند از اعتبار والد خود عبور کند.</p></div></article>
+          <article class="feature"><span class="feature-index">۰۴ / تحویل</span><div><h3>اتصال آماده کپی</h3><p>هاست، پورت، نام کاربری، رمز، اطلاعات ساده SSH یا رشته کامل <code>npvt-ssh://</code> را کپی کنید.</p></div></article>
+          <article class="feature"><span class="feature-index">۰۵ / فروش</span><div><h3>پلن و تلگرام</h3><p>پلن‌های قابل‌ویرایش منتشر کنید، نماینده ثابت تعیین کنید و سفارش‌ها را از ربات اختیاری تلگرام دریافت کنید.</p></div></article>
+          <article class="feature"><span class="feature-index">۰۶ / عملیات</span><div><h3>گزارش و بازیابی</h3><p>رویدادهای مدیریتی را بررسی کنید، پشتیبان محافظت‌شده بسازید و در صورت نیاز از مسیر Rollback استفاده کنید.</p></div></article>
         </div>
       </div>
     </section>
 
     <section class="section" id="architecture">
       <div class="shell">
-        <div class="section-head"><div><span class="eyebrow">A smaller trust boundary</span><h2>Host management stays separate.</h2></div><p>The default layout reserves public port 22 for customer tunnels and moves the VPS administration listener to 2222. Rahban validates the new listener before releasing port 22.</p></div>
+        <div class="section-head"><div><span class="eyebrow">مرز اعتماد کوچک‌تر</span><h2>مدیریت سرور جدا می‌ماند.</h2></div><p>در چیدمان پیش‌فرض، پورت عمومی ۲۲ برای تونل مشتریان است و مدیریت VPS به ۲۲۲۲ منتقل می‌شود. راه‌بان پیش از آزادکردن پورت ۲۲، شنونده جدید را بررسی می‌کند.</p></div>
         <div class="flow">
-          <article class="flow-step"><h3>Run installer</h3><p>Fresh secrets, database, SSH host keys and application files are generated locally.</p></article>
-          <article class="flow-step"><h3>Protect management</h3><p>A dedicated management listener starts on 2222 and is checked before the original listener stops.</p></article>
-          <article class="flow-step"><h3>Start isolation</h3><p>Traefik and the panel/SSH container start through Docker with persistent root-only state.</p></article>
-          <article class="flow-step"><h3>Issue accounts</h3><p>Customers authenticate on port 22 inside the container and receive forwarding—not a host shell.</p></article>
+          <article class="flow-step"><h3>اجرای نصب‌کننده</h3><p>رمزها، دیتابیس، کلیدهای SSH و فایل‌های برنامه به‌صورت تازه و محلی تولید می‌شوند.</p></article>
+          <article class="flow-step"><h3>محافظت از مدیریت</h3><p>شنونده مدیریتی اختصاصی روی ۲۲۲۲ فعال و بررسی می‌شود؛ سپس شنونده قبلی متوقف می‌گردد.</p></article>
+          <article class="flow-step"><h3>شروع ایزوله‌سازی</h3><p>Traefik و کانتینر پنل/SSH با Docker و فضای ذخیره دائمی مخصوص root اجرا می‌شوند.</p></article>
+          <article class="flow-step"><h3>ساخت حساب‌ها</h3><p>مشتریان داخل کانتینر روی پورت ۲۲ احراز هویت می‌شوند و Forwarding می‌گیرند، نه Shell اصلی سرور.</p></article>
         </div>
         <div class="port-map">
-          <article class="port-card customer"><span class="port-number">:22</span><h3>Customer SSH tunnel</h3><p>Panel-created users, SSH forwarding, SOCKS5 and client import configurations.</p></article>
-          <div class="port-divider">SEPARATE LISTENERS</div>
-          <article class="port-card"><span class="port-number">:2222</span><h3>VPS administration</h3><p>Your existing host administrator. The installer prints the exact future login command twice.</p></article>
+          <article class="port-card customer"><span class="port-number">:22</span><h3>تونل SSH مشتری</h3><p>کاربران ساخته‌شده در پنل، SSH Forwarding، پراکسی SOCKS5 و کانفیگ واردکردنی کلاینت.</p></article>
+          <div class="port-divider">دو شنونده جدا</div>
+          <article class="port-card"><span class="port-number">:2222</span><h3>مدیریت VPS</h3><p>حساب مدیر قبلی سرور. نصب‌کننده فرمان دقیق ورود بعدی را دو بار چاپ می‌کند.</p></article>
         </div>
       </div>
     </section>
 
     <section class="section paper" id="operators">
       <div class="shell">
-        <div class="section-head"><div><div class="kicker">Clear ownership</div><h2>One system, three working views.</h2></div><p>Each role sees the part of the network it owns. Credit and expiry flow downward; operational visibility stays scoped to the appropriate branch.</p></div>
+        <div class="section-head"><div><div class="kicker">مالکیت روشن</div><h2>یک سیستم، سه نمای کاری.</h2></div><p>هر نقش فقط بخش متعلق به خود را می‌بیند. اعتبار و انقضا رو به پایین واگذار می‌شوند و دسترسی مدیریتی در همان شاخه محدود می‌ماند.</p></div>
         <div class="audience-grid">
-          <article class="audience"><strong>Owner</strong><p>Control the full server and reseller tree.</p><ul><li>Allocate reseller credit</li><li>Review all customer groups</li><li>Manage backups and audit history</li></ul></article>
-          <article class="audience"><strong>Reseller</strong><p>Operate a private branch with bounded resources.</p><ul><li>Create customers and plans</li><li>Delegate to child resellers</li><li>Run an optional sales bot</li></ul></article>
-          <article class="audience"><strong>Customer</strong><p>Receive simple connection details without panel complexity.</p><ul><li>Copy or import configuration</li><li>Check quota and expiry</li><li>Change password through Telegram</li></ul></article>
+          <article class="audience"><strong>مالک</strong><p>کنترل کامل سرور و درخت نمایندگان.</p><ul><li>اختصاص اعتبار نمایندگان</li><li>مشاهده همه گروه‌های مشتری</li><li>مدیریت پشتیبان و گزارش‌ها</li></ul></article>
+          <article class="audience"><strong>نماینده</strong><p>مدیریت یک شاخه خصوصی با منابع مشخص.</p><ul><li>ساخت مشتری و پلن</li><li>واگذاری به زیرنماینده</li><li>اجرای ربات فروش اختیاری</li></ul></article>
+          <article class="audience"><strong>مشتری</strong><p>دریافت اطلاعات ساده اتصال، بدون پیچیدگی پنل.</p><ul><li>کپی یا واردکردن کانفیگ</li><li>بررسی حجم و انقضا</li><li>تغییر رمز از طریق تلگرام</li></ul></article>
         </div>
       </div>
     </section>
@@ -163,25 +150,25 @@
     <section class="section" id="install">
       <div class="shell">
         <div class="install-card">
-          <span class="eyebrow">Fresh VPS · four open ports</span>
-          <h2>One command. Keep the first session open.</h2>
-          <p>Before installation, allow TCP 22, 2222, 80 and 443 in the provider firewall and confirm emergency console access. Then run:</p>
-          <div class="command"><code id="install-command">curl -fsSL https://raw.githubusercontent.com/rahbanssh/rahbanssh/main/install.sh | sudo env RAHBAN_MOVE_HOST_SSH=1 bash</code><button class="copy" type="button" data-copy="#install-command" data-success="Copied">Copy</button></div>
-          <div class="warning"><strong>Do not close your current SSH session.</strong> Test the red-box management command printed by the installer in a second terminal first.</div>
-          <div class="cta-row"><a class="button" href="https://github.com/rahbanssh/rahbanssh#readme">Read deployment guide</a><a class="button secondary" href="https://github.com/rahbanssh/rahbanssh/blob/main/SECURITY.md">Security model</a></div>
+          <span class="eyebrow">VPS تازه · چهار پورت باز</span>
+          <h2>یک فرمان؛ نشست اول را باز نگه دارید.</h2>
+          <p>پیش از نصب، TCP پورت‌های ۲۲، ۲۲۲۲، ۸۰ و ۴۴۳ را در فایروال شرکت VPS باز کنید و دسترسی کنسول اضطراری را بررسی کنید. سپس اجرا کنید:</p>
+          <div class="command"><code id="install-command">curl -fsSL https://raw.githubusercontent.com/rahbanssh/rahbanssh/main/install.sh | sudo env RAHBAN_MOVE_HOST_SSH=1 bash</code><button class="copy" type="button" data-copy="#install-command" data-success="کپی شد">کپی</button></div>
+          <div class="warning"><strong>نشست SSH فعلی را نبندید.</strong> ابتدا فرمان مدیریتی داخل کادر قرمز نصب‌کننده را در یک ترمینال دوم آزمایش کنید.</div>
+          <div class="cta-row"><a class="button" href="https://github.com/rahbanssh/rahbanssh#readme">راهنمای نصب</a><a class="button secondary" href="https://github.com/rahbanssh/rahbanssh/blob/main/SECURITY.md">مدل امنیتی</a></div>
         </div>
       </div>
     </section>
 
     <section class="section" id="faq">
       <div class="faq shell">
-        <div><span class="eyebrow">Straight answers</span><h2>Before you deploy.</h2></div>
+        <div><span class="eyebrow">پاسخ روشن</span><h2>پیش از نصب.</h2></div>
         <div class="faq-list">
-          <details><summary>Is this a complete UDP VPN?</summary><p>No. Rahban is an SSH TCP tunneling platform. SSH forwarding and SOCKS5 work; native full-UDP behavior is outside the current scope.</p></details>
-          <details><summary>Can customers access the VPS host?</summary><p>No. Panel-created Linux users live inside the SSH container. The panel does not mount the host user database or host <code>/etc</code>.</p></details>
-          <details><summary>What happens to normal VPS SSH?</summary><p>The default installation moves host administration to port 2222 and gives customer SSH port 22. The installer prints and saves the exact replacement command.</p></details>
-          <details><summary>Does Rahban report credentials or charge commission?</summary><p>No. The project has no creator login, backdoor, credential reporting, hidden remote access or commission mechanism.</p></details>
-          <details><summary>Can I use a custom hostname?</summary><p>Yes. Point the hostname to the VPS first and pass it through <code>PANEL_PUBLIC_HOST</code>. Traefik handles HTTPS with Let’s Encrypt.</p></details>
+          <details><summary>آیا این یک VPN کامل UDP است؟</summary><p>خیر. راه‌بان یک پلتفرم تونل TCP بر پایه SSH است. SSH Forwarding و SOCKS5 کار می‌کنند؛ UDP کامل و بومی در محدوده نسخه فعلی نیست.</p></details>
+          <details><summary>آیا مشتری به سیستم اصلی VPS دسترسی دارد؟</summary><p>خیر. کاربران لینوکسی ساخته‌شده در پنل فقط داخل کانتینر SSH هستند و پنل به کاربران یا مسیر <code>/etc</code> میزبان دسترسی ندارد.</p></details>
+          <details><summary>برای SSH عادی VPS چه اتفاقی می‌افتد؟</summary><p>در نصب پیش‌فرض، مدیریت میزبان به پورت ۲۲۲۲ می‌رود و پورت ۲۲ به مشتریان اختصاص پیدا می‌کند. نصب‌کننده فرمان جایگزین را چاپ و ذخیره می‌کند.</p></details>
+          <details><summary>آیا راه‌بان اطلاعات می‌فرستد یا پورسانت می‌گیرد؟</summary><p>خیر. پروژه حساب سازنده، بک‌دور، گزارش اطلاعات ورود، دسترسی مخفی یا سیستم پورسانت ندارد.</p></details>
+          <details><summary>می‌توانم دامنه اختصاصی استفاده کنم؟</summary><p>بله. ابتدا دامنه را به VPS متصل و سپس آن را در <code>PANEL_PUBLIC_HOST</code> وارد کنید. Traefik گواهی HTTPS را از Let’s Encrypt دریافت می‌کند.</p></details>
         </div>
       </div>
     </section>
@@ -189,8 +176,8 @@
 
   <footer class="footer">
     <div class="footer-grid shell">
-      <div><h2>Make SSH access easier to operate.</h2><p>Open source, self-hosted and built for Persian-speaking sales networks.</p><small>© <span data-year></span> Rahban SSH · MIT License</small></div>
-      <div class="footer-links"><a href="https://github.com/rahbanssh/rahbanssh">GitHub</a><a href="mailto:rahbanssh@gmail.com">Email</a><a href="./fa/" lang="fa">فارسی</a></div>
+      <div><h2>مدیریت دسترسی SSH را ساده‌تر کنید.</h2><p>متن‌باز، قابل‌میزبانی شخصی و ساخته‌شده برای شبکه‌های فروش فارسی‌زبان.</p><small>© <span data-year></span> راه‌بان SSH · مجوز MIT</small></div>
+      <div class="footer-links"><a href="https://github.com/rahbanssh/rahbanssh">گیت‌هاب</a><a href="mailto:rahbanssh@gmail.com">ایمیل</a><a href="./en/" lang="en">English</a></div>
     </div>
   </footer>
   <script src="./assets/site.js" defer></script>

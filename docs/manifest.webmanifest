@@ -1,12 +1,12 @@
 {
-  "name": "Rahban SSH",
-  "short_name": "Rahban",
-  "description": "Open-source SSH tunnel and reseller management panel.",
+  "name": "راه‌بان SSH",
+  "short_name": "راه‌بان",
+  "description": "پنل متن‌باز مدیریت تونل SSH و نمایندگان فروش.",
   "start_url": "/rahbanssh/",
   "scope": "/rahbanssh/",
   "display": "standalone",
   "background_color": "#06110f",
   "theme_color": "#06110f",
-  "lang": "en",
-  "dir": "ltr"
+  "lang": "fa",
+  "dir": "rtl"
 }

@@ -1,3 +1,11 @@
+@font-face {
+  font-family: "Vazirmatn";
+  src: url("./fonts/Vazirmatn-Variable.woff2") format("woff2-variations");
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+}
+
 :root {
   --ink: #06110f;
   --panel: #0b1d19;
@@ -30,7 +38,11 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-body[dir="rtl"] { font-family: Tahoma, Arial, sans-serif; }
+body[dir="rtl"] {
+  font-family: "Vazirmatn", Tahoma, Arial, sans-serif;
+  font-feature-settings: "kern", "ss01";
+  line-height: 1.85;
+}
 a { color: inherit; }
 button, input { font: inherit; }
 .skip-link { position: fixed; left: 1rem; top: -5rem; z-index: 20; background: var(--lime); color: var(--ink); padding: .7rem 1rem; }
@@ -58,6 +70,27 @@ button, input { font: inherit; }
 .eyebrow { display: inline-flex; align-items: center; gap: .6rem; margin-bottom: 1.3rem; color: var(--lime); font: 750 .78rem/1.2 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .12em; text-transform: uppercase; }
 .eyebrow::before { content: ""; width: 2.5rem; height: 1px; background: currentColor; }
 h1, h2, h3 { margin: 0; line-height: 1.08; letter-spacing: -.045em; text-wrap: balance; }
+body[dir="rtl"] h1,
+body[dir="rtl"] h2,
+body[dir="rtl"] h3 {
+  line-height: 1.25;
+  letter-spacing: -.035em;
+}
+body[dir="rtl"] .hero-copy > p,
+body[dir="rtl"] .section-head p,
+body[dir="rtl"] .feature p,
+body[dir="rtl"] .flow-step p,
+body[dir="rtl"] .audience p,
+body[dir="rtl"] details p { line-height: 1.95; }
+body[dir="rtl"] .eyebrow,
+body[dir="rtl"] .kicker {
+  font-family: "Vazirmatn", Tahoma, sans-serif;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: none;
+}
+body[dir="rtl"] .brand { letter-spacing: -.015em; }
+body[dir="rtl"] .nav-links a { font-weight: 650; }
 h1 { max-width: 780px; font-size: clamp(3.4rem, 8vw, 7.2rem); }
 h1 em { color: var(--lime); font-style: normal; }
 .hero-copy > p { max-width: 650px; margin: 1.6rem 0 0; color: var(--muted); font-size: clamp(1.05rem, 2vw, 1.3rem); }

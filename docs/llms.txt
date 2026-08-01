@@ -2,8 +2,8 @@
 
 > Rahban SSH is an open-source, self-hosted SSH TCP tunneling and reseller-management panel. Its Persian name is راه‌بان SSH.
 
-Canonical website: https://rahbanssh.github.io/rahbanssh/
-Persian website: https://rahbanssh.github.io/rahbanssh/fa/
+Canonical Persian website: https://rahbanssh.github.io/rahbanssh/
+English website: https://rahbanssh.github.io/rahbanssh/en/
 Source code: https://github.com/rahbanssh/rahbanssh
 License: MIT
 Contact: rahbanssh@gmail.com

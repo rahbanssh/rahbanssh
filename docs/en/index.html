@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Rahban SSH — Open-Source SSH VPN & Reseller Panel</title>
+  <meta name="description" content="Deploy a self-hosted SSH tunnel panel with Docker isolation, reseller accounting, traffic limits, Telegram sales tools and paste-ready NPV configurations.">
+  <meta name="keywords" content="SSH VPN panel, SSH reseller panel, Docker SSH panel, NPV Tunnel, traffic accounting, Telegram SSH bot, Rahban SSH">
+  <meta name="theme-color" content="#06110f">
+  <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
+  <link rel="canonical" href="https://rahbanssh.github.io/rahbanssh/en/">
+  <link rel="alternate" hreflang="en" href="https://rahbanssh.github.io/rahbanssh/en/">
+  <link rel="alternate" hreflang="fa" href="https://rahbanssh.github.io/rahbanssh/">
+  <link rel="alternate" hreflang="x-default" href="https://rahbanssh.github.io/rahbanssh/">
+  <link rel="stylesheet" href="../assets/styles.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Rahban SSH">
+  <meta property="og:title" content="Rahban SSH — SSH access, governed.">
+  <meta property="og:description" content="An open-source, Docker-isolated SSH tunnel and reseller panel with traffic accounting, Telegram tools and one-line deployment.">
+  <meta property="og:url" content="https://rahbanssh.github.io/rahbanssh/en/">
+  <meta property="og:image" content="https://rahbanssh.github.io/rahbanssh/assets/og.png">
+  <meta property="og:image:alt" content="Rahban SSH dashboard and separate port 22 customer and port 2222 management routes">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Rahban SSH — SSH access, governed.">
+  <meta name="twitter:description" content="Open-source SSH tunnel and reseller management, isolated in Docker.">
+  <meta name="twitter:image" content="https://rahbanssh.github.io/rahbanssh/assets/og.png">
+  <meta name="twitter:image:alt" content="Rahban SSH — SSH access, governed">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "@id": "https://rahbanssh.github.io/rahbanssh/#software",
+        "name": "Rahban SSH",
+        "alternateName": "راه‌بان SSH",
+        "url": "https://rahbanssh.github.io/rahbanssh/",
+        "downloadUrl": "https://github.com/rahbanssh/rahbanssh",
+        "codeRepository": "https://github.com/rahbanssh/rahbanssh",
+        "applicationCategory": "NetworkApplication",
+        "applicationSubCategory": "SSH tunnel and reseller management panel",
+        "operatingSystem": "Linux server (Ubuntu, Debian, Fedora)",
+        "softwareRequirements": "Docker-compatible public Linux VPS",
+        "license": "https://opensource.org/license/mit",
+        "isAccessibleForFree": true,
+        "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"},
+        "description": "A self-hosted SSH tunnel account and reseller panel with Docker isolation, traffic accounting, expiry controls, Telegram sales tools and NPV configurations.",
+        "inLanguage": ["en", "fa"]
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {"@type": "Question", "name": "Does Rahban SSH modify VPS management access?", "acceptedAnswer": {"@type": "Answer", "text": "For the default port layout, customer SSH uses port 22 and VPS management moves to port 2222. The installer prints the exact future management command and provides rollback."}},
+          {"@type": "Question", "name": "Is Rahban SSH a full UDP VPN?", "acceptedAnswer": {"@type": "Answer", "text": "Rahban is an SSH TCP tunneling platform. It supports SSH forwarding and SOCKS5 traffic; it does not claim native full-UDP VPN behavior."}},
+          {"@type": "Question", "name": "Does the project contain a backdoor or commission system?", "acceptedAnswer": {"@type": "Answer", "text": "No. Rahban SSH is MIT-licensed and does not include creator access, credential reporting, a commission mechanism or a hidden remote-access account."}}
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <nav class="nav shell" aria-label="Primary navigation">
+      <a class="brand" href="./" aria-label="Rahban SSH home"><span class="brand-mark">R</span><span>Rahban SSH</span></a>
+      <div class="nav-links">
+        <a href="#features">Features</a><a href="#architecture">Architecture</a><a href="#install">Install</a><a href="#faq">FAQ</a>
+        <a class="github-nav" href="https://github.com/rahbanssh/rahbanssh">GitHub</a>
+        <a class="language" href="../" lang="fa" hreflang="fa">فارسی</a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section class="hero">
+      <div class="hero-grid shell">
+        <div class="hero-copy">
+          <span class="eyebrow">Open source · Docker isolated</span>
+          <h1>SSH access,<br><em>governed.</em></h1>
+          <p>Build, allocate and observe SSH tunnel accounts from one responsive panel—with reseller credit, live usage, expiry controls, Telegram sales tools and paste-ready NPV configurations.</p>
+          <div class="cta-row">
+            <a class="button" href="#install">Deploy Rahban <span aria-hidden="true">↘</span></a>
+            <a class="button secondary" href="https://github.com/rahbanssh/rahbanssh">View source</a>
+          </div>
+          <div class="microcopy"><span>MIT licensed</span><span>Zero-state install</span><span>Persian-first UI</span></div>
+        </div>
+        <div class="product-window" aria-label="Illustration of the Rahban owner dashboard">
+          <div class="window-inner">
+            <div class="window-bar"><span class="dots"><i></i><i></i><i></i></span><span>owner / dashboard</span></div>
+            <div class="dashboard">
+              <div class="metric-grid">
+                <div class="metric"><small>Active users</small><strong>184</strong></div>
+                <div class="metric"><small>Online now</small><strong>37</strong></div>
+                <div class="metric"><small>Resellers</small><strong>12</strong></div>
+              </div>
+              <div class="activity">
+                <div class="activity-head"><span>account</span><span>status</span><span>usage</span></div>
+                <div class="activity-row"><span>user_1048</span><span class="status">active</span><span class="usage"><i style="--usage:61%"></i></span></div>
+                <div class="activity-row"><span>user_2093</span><span class="status">active</span><span class="usage"><i style="--usage:28%"></i></span></div>
+                <div class="activity-row"><span>user_3770</span><span class="status">active</span><span class="usage"><i style="--usage:82%"></i></span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="trust" aria-label="Project highlights">
+      <div class="trust-grid shell">
+        <div class="trust-item"><strong>Isolated</strong><span>Customer users stay inside Docker</span></div>
+        <div class="trust-item"><strong>Delegated</strong><span>Nested reseller traffic credit</span></div>
+        <div class="trust-item"><strong>Observable</strong><span>Usage, sessions and last IP</span></div>
+        <div class="trust-item"><strong>Portable</strong><span>One-line Linux VPS deployment</span></div>
+      </div>
+    </section>
+
+    <section class="section paper" id="features">
+      <div class="shell">
+        <div class="section-head"><div><div class="kicker">Designed for operators</div><h2>From one account to a sales network.</h2></div><p>Rahban joins account lifecycle, reseller allocation and customer-ready connection details without exposing host users or requiring a heavyweight control plane.</p></div>
+        <div class="feature-grid">
+          <article class="feature"><span class="feature-index">01 / CONTROL</span><div><h3>Account lifecycle</h3><p>Create, disable, extend, disconnect or regenerate accounts. Enforce quota, exact expiry and 1–100 simultaneous connections.</p></div></article>
+          <article class="feature"><span class="feature-index">02 / ACCOUNTING</span><div><h3>Traffic visibility</h3><p>See live sessions, used bytes, remaining allowance and last-seen IP with automated quota enforcement.</p></div></article>
+          <article class="feature"><span class="feature-index">03 / RESELLERS</span><div><h3>Delegated credit</h3><p>Allocate traffic and expiry to resellers and child resellers while preventing a branch from exceeding its parent.</p></div></article>
+          <article class="feature"><span class="feature-index">04 / DELIVERY</span><div><h3>Paste-ready access</h3><p>Copy host, port, username, password, plain SSH details or a complete <code>npvt-ssh://</code> import string.</p></div></article>
+          <article class="feature"><span class="feature-index">05 / SALES</span><div><h3>Plans and Telegram</h3><p>Publish editable service plans, assign permanent agents and optionally receive orders through a reseller’s Telegram bot.</p></div></article>
+          <article class="feature"><span class="feature-index">06 / OPERATIONS</span><div><h3>Audit and recovery</h3><p>Track administrative actions, create protected backups and use the generated rollback path when an installation must be stopped.</p></div></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="architecture">
+      <div class="shell">
+        <div class="section-head"><div><span class="eyebrow">A smaller trust boundary</span><h2>Host management stays separate.</h2></div><p>The default layout reserves public port 22 for customer tunnels and moves the VPS administration listener to 2222. Rahban validates the new listener before releasing port 22.</p></div>
+        <div class="flow">
+          <article class="flow-step"><h3>Run installer</h3><p>Fresh secrets, database, SSH host keys and application files are generated locally.</p></article>
+          <article class="flow-step"><h3>Protect management</h3><p>A dedicated management listener starts on 2222 and is checked before the original listener stops.</p></article>
+          <article class="flow-step"><h3>Start isolation</h3><p>Traefik and the panel/SSH container start through Docker with persistent root-only state.</p></article>
+          <article class="flow-step"><h3>Issue accounts</h3><p>Customers authenticate on port 22 inside the container and receive forwarding—not a host shell.</p></article>
+        </div>
+        <div class="port-map">
+          <article class="port-card customer"><span class="port-number">:22</span><h3>Customer SSH tunnel</h3><p>Panel-created users, SSH forwarding, SOCKS5 and client import configurations.</p></article>
+          <div class="port-divider">SEPARATE LISTENERS</div>
+          <article class="port-card"><span class="port-number">:2222</span><h3>VPS administration</h3><p>Your existing host administrator. The installer prints the exact future login command twice.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section paper" id="operators">
+      <div class="shell">
+        <div class="section-head"><div><div class="kicker">Clear ownership</div><h2>One system, three working views.</h2></div><p>Each role sees the part of the network it owns. Credit and expiry flow downward; operational visibility stays scoped to the appropriate branch.</p></div>
+        <div class="audience-grid">
+          <article class="audience"><strong>Owner</strong><p>Control the full server and reseller tree.</p><ul><li>Allocate reseller credit</li><li>Review all customer groups</li><li>Manage backups and audit history</li></ul></article>
+          <article class="audience"><strong>Reseller</strong><p>Operate a private branch with bounded resources.</p><ul><li>Create customers and plans</li><li>Delegate to child resellers</li><li>Run an optional sales bot</li></ul></article>
+          <article class="audience"><strong>Customer</strong><p>Receive simple connection details without panel complexity.</p><ul><li>Copy or import configuration</li><li>Check quota and expiry</li><li>Change password through Telegram</li></ul></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="install">
+      <div class="shell">
+        <div class="install-card">
+          <span class="eyebrow">Fresh VPS · four open ports</span>
+          <h2>One command. Keep the first session open.</h2>
+          <p>Before installation, allow TCP 22, 2222, 80 and 443 in the provider firewall and confirm emergency console access. Then run:</p>
+          <div class="command"><code id="install-command">curl -fsSL https://raw.githubusercontent.com/rahbanssh/rahbanssh/main/install.sh | sudo env RAHBAN_MOVE_HOST_SSH=1 bash</code><button class="copy" type="button" data-copy="#install-command" data-success="Copied">Copy</button></div>
+          <div class="warning"><strong>Do not close your current SSH session.</strong> Test the red-box management command printed by the installer in a second terminal first.</div>
+          <div class="cta-row"><a class="button" href="https://github.com/rahbanssh/rahbanssh#readme">Read deployment guide</a><a class="button secondary" href="https://github.com/rahbanssh/rahbanssh/blob/main/SECURITY.md">Security model</a></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="faq">
+      <div class="faq shell">
+        <div><span class="eyebrow">Straight answers</span><h2>Before you deploy.</h2></div>
+        <div class="faq-list">
+          <details><summary>Is this a complete UDP VPN?</summary><p>No. Rahban is an SSH TCP tunneling platform. SSH forwarding and SOCKS5 work; native full-UDP behavior is outside the current scope.</p></details>
+          <details><summary>Can customers access the VPS host?</summary><p>No. Panel-created Linux users live inside the SSH container. The panel does not mount the host user database or host <code>/etc</code>.</p></details>
+          <details><summary>What happens to normal VPS SSH?</summary><p>The default installation moves host administration to port 2222 and gives customer SSH port 22. The installer prints and saves the exact replacement command.</p></details>
+          <details><summary>Does Rahban report credentials or charge commission?</summary><p>No. The project has no creator login, backdoor, credential reporting, hidden remote access or commission mechanism.</p></details>
+          <details><summary>Can I use a custom hostname?</summary><p>Yes. Point the hostname to the VPS first and pass it through <code>PANEL_PUBLIC_HOST</code>. Traefik handles HTTPS with Let’s Encrypt.</p></details>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-grid shell">
+      <div><h2>Make SSH access easier to operate.</h2><p>Open source, self-hosted and built for Persian-speaking sales networks.</p><small>© <span data-year></span> Rahban SSH · MIT License</small></div>
+      <div class="footer-links"><a href="https://github.com/rahbanssh/rahbanssh">GitHub</a><a href="mailto:rahbanssh@gmail.com">Email</a><a href="../" lang="fa">فارسی</a></div>
+    </div>
+  </footer>
+  <script src="../assets/site.js" defer></script>
+</body>
+</html>
