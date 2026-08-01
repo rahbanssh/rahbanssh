@@ -55,6 +55,12 @@ ssh -p 2222 root@SERVER_IP
 The explicit `RAHBAN_MOVE_HOST_SSH=1` installation flag acknowledges this
 lockout risk. Without it, the installer refuses to claim port 22.
 
+The installer detects `SUDO_USER` and prints the exact future management
+command twice in a red terminal warning box—before the port move and after a
+successful installation. It also stores the command in the root-only
+`install-summary.txt`. `MANAGEMENT_SSH_USER` can override the detected login
+name when required.
+
 ## TLS and hostname
 
 Without `PANEL_PUBLIC_HOST`, the installer derives a hostname such as

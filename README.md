@@ -13,6 +13,13 @@
 
 پورت ۲۲ ممکن است در بعضی شبکه‌ها در دسترس‌تر باشد، ولی هیچ تضمینی برای عبور از محدودیت‌های شبکه یا فیلترینگ وجود ندارد. راه‌بان پورت SSH مدیریتی VPS را بدون تغییر فایل اصلی `sshd_config` به سرویس اختصاصی پورت ۲۲۲۲ منتقل می‌کند و پورت ۲۲ را به کانتینر مشتریان می‌دهد.
 
+> [!CAUTION]
+> پس از نصب، ورود مدیریتی قبلی روی پورت ۲۲ دیگر برای VPS اصلی نیست. نصب‌کننده فرمان کامل جدید را داخل یک کادر قرمز چاپ و در فایل `install-summary.txt` ذخیره می‌کند. آن فرمان را نگه دارید و تا زمانی که در ترمینال دوم کار نکرده، اتصال فعلی را نبندید:
+>
+> ```bash
+> ssh -p 2222 root@SERVER_IP
+> ```
+
 ### قبل از نصب — بسیار مهم
 
 1. در فایروال پنل شرکت VPS، پورت‌های TCP زیر را باز کنید: `22`، `2222`، `80` و `443`.
@@ -38,6 +45,7 @@ curl -fsSL https://raw.githubusercontent.com/rahbanssh/rahbanssh/main/install.sh
 - Traefik و گواهی رایگان Let's Encrypt را راه‌اندازی می‌کند؛
 - دیتابیس خالی، کلیدهای SSH و رمز تصادفی مدیر را می‌سازد؛
 - لینک پنل، نام کاربری، رمز مدیر و هر دو پورت SSH را چاپ می‌کند.
+- فرمان کامل اتصال بعدی به VPS را داخل یک کادر قرمز و واضح چاپ می‌کند.
 
 اطلاعات نصب فقط برای root در این فایل نیز ذخیره می‌شود:
 
@@ -102,6 +110,13 @@ Rahban SSH is a Persian-first, responsive panel for managing SSH Tunnel accounts
 
 Port 22 may be reachable on networks that restrict uncommon ports, but this is not guaranteed. Rahban creates a dedicated management SSH service on port 2222, stops the original host listener, and then publishes the isolated customer container on port 22.
 
+> [!CAUTION]
+> After installation, the old port-22 login no longer reaches the VPS host. The installer prints the complete replacement command in a prominent red terminal box and saves it in `install-summary.txt`. Keep it, and do not close the current session until this works in a second terminal:
+>
+> ```bash
+> ssh -p 2222 root@SERVER_IP
+> ```
+
 ### Critical prerequisites
 
 1. Allow inbound TCP `22`, `2222`, `80`, and `443` in the VPS provider firewall.
@@ -130,6 +145,8 @@ ssh -p 22 CUSTOMER_USERNAME@SERVER_IP
 ```
 
 The installer detects the public IPv4 address, creates an `sslip.io` hostname, installs Docker if needed, obtains a Let's Encrypt certificate, starts the panel and isolated SSH service, creates a zero-state SQLite database and random secrets, and prints the panel URL and credentials.
+
+It also prints and saves the exact future management command, using the detected sudo user when applicable—for example `ssh -p 2222 ubuntu@SERVER_IP` instead of assuming root.
 
 The root-only installation summary is available at:
 

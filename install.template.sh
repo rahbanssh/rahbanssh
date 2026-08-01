@@ -4,12 +4,31 @@ set -Eeuo pipefail
 INSTALL_DIR="${INSTALL_DIR:-/opt/ssh-vpn-panel}"
 CUSTOMER_SSH_PORT="${CUSTOMER_SSH_PORT:-22}"
 MANAGEMENT_SSH_PORT="${MANAGEMENT_SSH_PORT:-2222}"
+MANAGEMENT_SSH_USER="${MANAGEMENT_SSH_USER:-${SUDO_USER:-root}}"
 RAHBAN_MOVE_HOST_SSH="${RAHBAN_MOVE_HOST_SSH:-}"
 PANEL_HOST_PORT="${PANEL_HOST_PORT:-19080}"
 PANEL_ADMIN_USERNAME="${PANEL_ADMIN_USERNAME:-admin}"
 PANEL_TITLE="${PANEL_TITLE:-Rahban · راه‌بان}"
 started=0
 host_ssh_moved=0
+
+print_management_access_box() {
+  local red="" reset=""
+  if [[ -t 1 ]]; then
+    red=$'\033[1;31m'
+    reset=$'\033[0m'
+  fi
+  printf '\n%s' "$red"
+  printf '######################################################################\n'
+  printf '# 🔴 IMPORTANT: SAVE THIS COMMAND                                    #\n'
+  printf '# Your VPS management SSH has moved away from customer port 22.      #\n'
+  printf '# From now on, manage this VPS with:                                 #\n'
+  printf '#                                                                    #\n'
+  printf '  ssh -p %s %s@%s\n' "$MANAGEMENT_SSH_PORT" "$MANAGEMENT_SSH_USER" "$public_ip"
+  printf '#                                                                    #\n'
+  printf '# Keep this terminal open until the command works in a second one.   #\n'
+  printf '######################################################################%s\n\n' "$reset"
+}
 
 restore_host_ssh() {
   [[ "$host_ssh_moved" == "1" ]] || return 0
@@ -53,6 +72,7 @@ trap on_error ERR
 [[ "${EUID}" -eq 0 ]] || fail "Run this installer as root or with sudo."
 [[ "$CUSTOMER_SSH_PORT" =~ ^[0-9]+$ ]] || fail "CUSTOMER_SSH_PORT must be numeric."
 [[ "$MANAGEMENT_SSH_PORT" =~ ^[0-9]+$ ]] || fail "MANAGEMENT_SSH_PORT must be numeric."
+[[ "$MANAGEMENT_SSH_USER" =~ ^[a-z_][a-z0-9_-]{0,31}$ ]] || fail "Invalid management SSH username."
 [[ "$PANEL_HOST_PORT" =~ ^[0-9]+$ ]] || fail "PANEL_HOST_PORT must be numeric."
 [[ "$PANEL_ADMIN_USERNAME" =~ ^[a-z][a-z0-9_-]{2,31}$ ]] || fail "Invalid panel administrator username."
 [[ "$PANEL_TITLE" != *$'\n'* ]] || fail "PANEL_TITLE cannot contain a newline."
@@ -115,6 +135,10 @@ public_ip="${CUSTOMER_PUBLIC_HOST:-$(curl -4fsS --max-time 15 https://api.ipify.
 ip_slug="${public_ip//./-}"
 panel_host="${PANEL_PUBLIC_HOST:-ssh-panel-${ip_slug}.sslip.io}"
 [[ "$panel_host" =~ ^[A-Za-z0-9.-]+$ ]] || fail "PANEL_PUBLIC_HOST is not a valid hostname."
+
+if [[ "$CUSTOMER_SSH_PORT" == "22" ]]; then
+  print_management_access_box
+fi
 
 umask 077
 mkdir -p "$INSTALL_DIR/data/backups" "$INSTALL_DIR/data/ssh" "$INSTALL_DIR/secrets" "$INSTALL_DIR/letsencrypt"
@@ -263,7 +287,7 @@ panel_url="https://${panel_host}"
   printf 'Admin password: %s\n' "$admin_password"
   printf 'Customer SSH endpoint: %s:%s\n' "$public_ip" "$CUSTOMER_SSH_PORT"
   if [[ "$CUSTOMER_SSH_PORT" == "22" ]]; then
-    printf 'VPS management SSH: root@%s port %s\n' "$public_ip" "$MANAGEMENT_SSH_PORT"
+    printf 'VPS management SSH command: ssh -p %s %s@%s\n' "$MANAGEMENT_SSH_PORT" "$MANAGEMENT_SSH_USER" "$public_ip"
   else
     printf 'VPS management SSH: unchanged by Rahban\n'
   fi
@@ -278,7 +302,7 @@ printf '\nSSH VPN Manager installed successfully.\n\n'
 cat "$INSTALL_DIR/install-summary.txt"
 if [[ "$CUSTOMER_SSH_PORT" == "22" ]]; then
   printf '\nAllow inbound TCP ports 80, 443, %s (customers), and %s (VPS management) in your provider firewall.\n' "$CUSTOMER_SSH_PORT" "$MANAGEMENT_SSH_PORT"
-  printf 'IMPORTANT: Before closing this session, test a second management login: ssh -p %s root@%s\n' "$MANAGEMENT_SSH_PORT" "$public_ip"
+  print_management_access_box
 else
   printf '\nAllow inbound TCP ports 80, 443, and %s (customers) in your provider firewall.\n' "$CUSTOMER_SSH_PORT"
 fi
