@@ -1,0 +1,35 @@
+# Rahban SSH
+
+> Rahban SSH is an open-source, self-hosted SSH TCP tunneling and reseller-management panel. Its Persian name is راه‌بان SSH.
+
+Canonical website: https://rahbanssh.github.io/rahbanssh/
+Persian website: https://rahbanssh.github.io/rahbanssh/fa/
+Source code: https://github.com/rahbanssh/rahbanssh
+License: MIT
+Contact: rahbanssh@gmail.com
+
+## Core capabilities
+
+- Customer SSH users isolated inside a Docker container
+- Owner, reseller, and nested child-reseller roles
+- Delegated traffic credit and parent-expiry enforcement
+- Per-user quota, exact expiry, active state, and concurrent-connection limits
+- Live session, byte usage, and last-IP reporting
+- Editable service plans and optional Telegram sales bots
+- Copyable SSH credentials and paste-ready npvt-ssh:// configurations
+- One-line deployment with Traefik and Let's Encrypt
+- Audit events, protected backups, and rollback support
+
+## Port model
+
+The default fresh installation publishes customer SSH on TCP port 22 and moves VPS management SSH to TCP port 2222. The installer validates the new management listener before releasing port 22, prints the exact future management command, and provides rollback.
+
+## Scope and trust
+
+Rahban SSH provides SSH TCP forwarding and SOCKS5 tunneling. It is not represented as a native full-UDP VPN. The project does not contain a creator account, backdoor, credential-reporting mechanism, hidden remote access, or commission system.
+
+## Primary documentation
+
+- Installation and overview: https://github.com/rahbanssh/rahbanssh#readme
+- Deployment and recovery: https://github.com/rahbanssh/rahbanssh/blob/main/DEPLOYMENT.md
+- Security policy: https://github.com/rahbanssh/rahbanssh/blob/main/SECURITY.md
