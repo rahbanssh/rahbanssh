@@ -6,13 +6,14 @@
 - An `apt`- or `dnf`-based distribution.
 - Docker-compatible CPU architecture.
 - Free inbound ports 80 and 443.
-- A free customer SSH port; the installer defaults to 2222.
-- Provider firewall rules allowing TCP 80, 443, and the customer SSH port.
+- Free customer port 22 and management port 2222.
+- Provider firewall rules allowing TCP 22, 2222, 80, and 443.
+- Working provider emergency/VNC console access.
 
 ## One-line deployment
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/rahbanssh/rahbanssh/main/install.sh | sudo bash
+curl -fsSL https://raw.githubusercontent.com/rahbanssh/rahbanssh/main/install.sh | sudo env RAHBAN_MOVE_HOST_SSH=1 bash
 ```
 
 For stronger supply-chain control, download a tagged release, review
@@ -35,17 +36,24 @@ The default installation directory is `/opt/ssh-vpn-panel`:
 - `letsencrypt/acme.json`: TLS account and certificate state
 - `install-summary.txt`: root-only credentials and endpoints
 - `rollback.sh`: stops only this Compose project and preserves data
+- `host-ssh-*-units`: original systemd SSH state used by rollback
 
 ## Port strategy
 
-Rahban deliberately does not reconfigure the host SSH daemon. Customer SSH is
-published on port 2222 by default so administrative SSH can remain on port 22.
-Changing host SSH remotely can lock out the VPS and is outside the installer.
+Rahban publishes customer SSH on port 22 and creates a dedicated systemd
+OpenSSH listener for VPS administration on port 2222. It validates that the new
+listener is locally active before stopping and disabling the original SSH
+listener. The current established SSH session should remain alive, but an
+external provider firewall can still block 2222. Allow that port and confirm
+console recovery before installation. Keep the first session open until this
+works from a second terminal:
 
-If you explicitly want customer SSH on port 22, first move and test host
-administration using your provider console and a separate SSH session. Then run
-the installer with `CUSTOMER_SSH_PORT=22` only after port 22 is demonstrably
-free.
+```bash
+ssh -p 2222 root@SERVER_IP
+```
+
+The explicit `RAHBAN_MOVE_HOST_SSH=1` installation flag acknowledges this
+lockout risk. Without it, the installer refuses to claim port 22.
 
 ## TLS and hostname
 

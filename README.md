@@ -1,170 +1,152 @@
-# Rahban SSH · راه‌بان
+# راه‌بان SSH · Rahban SSH
 
-Rahban SSH is a self-hosted, Persian-first SSH account and reseller panel. It
-runs customer SSH accounts inside an isolated Docker container and provides a
-responsive HTTPS administration panel with traffic accounting, expiry,
-connection limits, multi-level reseller credit, service plans, paste-ready NPV
-Tunnel configurations, and optional Telegram sales bots.
+## راهنمای فارسی
 
-## Install on a clean VPS
+راه‌بان یک پنل فارسی و واکنش‌گرا برای ساخت و مدیریت حساب‌های SSH Tunnel است. حساب‌های مشتریان داخل یک کانتینر Docker ایزوله ساخته می‌شوند و به کاربران سیستم‌عامل اصلی VPS دسترسی ندارند.
 
-Run as `root` on a public Debian, Ubuntu, Fedora, or other `apt`/`dnf` VPS:
+### ساختار پورت‌ها
 
-```bash
-curl -fsSL https://raw.githubusercontent.com/rahbanssh/rahbanssh/main/install.sh | sudo bash
-```
+- `22/tcp`: اتصال مشتریان و کانفیگ‌های SSH Tunnel
+- `2222/tcp`: مدیریت خود VPS با کاربر `root` یا مدیر سرور
+- `80/tcp` و `443/tcp`: پنل وب و دریافت خودکار SSL
+- `127.0.0.1:19080`: دسترسی اضطراری محلی به پنل
 
-The installer automatically:
+پورت ۲۲ ممکن است در بعضی شبکه‌ها در دسترس‌تر باشد، ولی هیچ تضمینی برای عبور از محدودیت‌های شبکه یا فیلترینگ وجود ندارد. راه‌بان پورت SSH مدیریتی VPS را بدون تغییر فایل اصلی `sshd_config` به سرویس اختصاصی پورت ۲۲۲۲ منتقل می‌کند و پورت ۲۲ را به کانتینر مشتریان می‌دهد.
 
-- detects the VPS public IPv4 address;
-- creates `ssh-panel-IP-WITH-DASHES.sslip.io`;
-- installs Docker when it is absent;
-- starts Traefik on ports 80/443;
-- requests and renews a Let's Encrypt TLS certificate;
-- builds the isolated SSH/panel container;
-- creates an empty SQLite database and new SSH host keys;
-- generates a random administrator master password;
-- prints the HTTPS URL, username, password, customer endpoint, and rollback
-  command;
-- saves the same summary root-only at
-  `/opt/ssh-vpn-panel/install-summary.txt`.
+### قبل از نصب — بسیار مهم
 
-No database, password, bot token, user account, SSH key, server address, or
-operator identity is bundled in this repository.
+1. در فایروال پنل شرکت VPS، پورت‌های TCP زیر را باز کنید: `22`، `2222`، `80` و `443`.
+2. مطمئن شوید به کنسول اضطراری/VNC شرکت ارائه‌دهنده VPS دسترسی دارید.
+3. نصب را در یک نشست SSH باز اجرا کنید و تا آزمایش اتصال دوم، نشست فعلی را نبندید.
+4. بهتر است نصب ابتدا روی یک VPS تازه انجام شود.
 
-### Default ports
+### نصب یک‌خطی
 
-- `80/tcp` and `443/tcp`: HTTPS and certificate issuance.
-- `2222/tcp`: customer SSH.
-- Host `22/tcp`: left untouched for safe VPS administration.
-- `127.0.0.1:19080`: emergency loopback access to the panel.
-
-The safe default is customer port 2222 because most VPS hosts already use port
-22 for administration. Do not move host SSH or claim port 22 remotely unless
-you have tested a second management connection and have console recovery.
-
-Open inbound TCP ports 80, 443, and 2222 in the VPS provider firewall.
-
-### Installation options
-
-Environment variables can customize the installation:
+روی Ubuntu، Debian، Fedora یا سیستم مبتنی بر `apt`/`dnf` با دسترسی root اجرا کنید:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/rahbanssh/rahbanssh/main/install.sh |
-  sudo CUSTOMER_SSH_PORT=2022 PANEL_PUBLIC_HOST=panel.example.com bash
+curl -fsSL https://raw.githubusercontent.com/rahbanssh/rahbanssh/main/install.sh | sudo env RAHBAN_MOVE_HOST_SSH=1 bash
 ```
 
-Supported options:
+نصب‌کننده به‌صورت خودکار:
 
-- `INSTALL_DIR` — default `/opt/ssh-vpn-panel`
-- `CUSTOMER_SSH_PORT` — default `2222`
-- `PANEL_HOST_PORT` — default `19080`, bound only to loopback
-- `PANEL_ADMIN_USERNAME` — default `admin`
-- `PANEL_TITLE` — default `Rahban · راه‌بان`
-- `CUSTOMER_PUBLIC_HOST` — auto-detected when omitted
-- `PANEL_PUBLIC_HOST` — automatic `sslip.io` hostname when omitted
+- IPv4 عمومی سرور را تشخیص می‌دهد؛
+- آدرسی شبیه `ssh-panel-203-0-113-10.sslip.io` می‌سازد؛
+- Docker را در صورت نیاز نصب می‌کند؛
+- سرویس مدیریت VPS را روی پورت ۲۲۲۲ راه‌اندازی و آزمایش محلی می‌کند؛
+- SSH اصلی سیستم را متوقف می‌کند و پورت ۲۲ را به کانتینر مشتریان می‌دهد؛
+- Traefik و گواهی رایگان Let's Encrypt را راه‌اندازی می‌کند؛
+- دیتابیس خالی، کلیدهای SSH و رمز تصادفی مدیر را می‌سازد؛
+- لینک پنل، نام کاربری، رمز مدیر و هر دو پورت SSH را چاپ می‌کند.
 
-A custom hostname must already resolve to the VPS before installation so
-Let's Encrypt can validate it.
-
-## Main features
-
-- Owner, reseller, and nested child-reseller roles.
-- Delegated traffic credit with overselling and parent-expiry protection.
-- Per-user traffic, exact expiry, active/disabled state, and 1–100 concurrent
-  connection limits.
-- Quick administration buttons for adding time, quota, and connection slots.
-- Persian/Jalali expiry display.
-- Custom sales plans with arbitrary name, duration, quota, connection count,
-  displayed price, and description.
-- Safe plan deletion: removed plans disappear from sales while historical
-  orders remain available.
-- Live usage and last-IP reporting.
-- Copyable host, port, username, password, plain SSH details, and `npvt-ssh://`
-  configuration.
-- Optional Telegram bot per reseller, numeric Telegram-ID SSH usernames,
-  customer self-service password changes, trials, account status, client links,
-  purchase requests, permanent agent assignment, and reseller applications.
-- Immediate purchase notification to the responsible reseller's configured
-  numeric Telegram ID.
-- Audit log and root-only application backups.
-
-There is no commission, backdoor, credential reporting, creator account, or
-remote access mechanism.
-
-## Reseller accounting
-
-The Owner allocates traffic credit and an expiry date to a reseller. Customer
-quotas and credit allocated to child resellers are reserved from that balance.
-A branch cannot allocate more traffic than it owns or create service past its
-parent's expiry. Each reseller sees only its own branch, users, plans, requests,
-usage, audit records, bot settings, and remaining credit.
-
-## Telegram setup
-
-Create a bot with BotFather and paste only its token into **Settings → Telegram**.
-Tokens are encrypted at rest using a root-only application secret. Configure a
-numeric Telegram ID for order notifications; that Telegram account must start
-the bot at least once before the bot can send it a private message.
-
-New bot customers use their immutable numeric Telegram ID as their SSH
-username. `/password` changes the VPN password in a private chat and disconnects
-old sessions. Phone sharing is optional and used only when a reseller applicant
-explicitly presses Telegram's contact-sharing button.
-
-## Security model
-
-- Customer users exist only inside the SSH container.
-- The panel container does not mount host `/etc`, host users, the host network,
-  or the Docker socket.
-- The Traefik proxy mounts the Docker socket read-only for service discovery.
-- The panel is published through HTTPS; its direct port is loopback-only.
-- Runtime state lives under `/opt/ssh-vpn-panel` with restrictive permissions.
-- The generated bootstrap password is a permanent recovery master. A separate
-  secondary administrator password can be changed in Settings.
-- Customer passwords are stored as Linux password hashes plus authenticated
-  encrypted credentials only when configuration redisplay is required.
-- The installer refuses occupied ports and does not alter the host SSH daemon,
-  firewall, users, or existing Docker projects.
-
-## Manual development start
-
-Copy `.env.example` to `.env`, replace the documentation IP with the server's
-real public IP, create the protected directories and password, then run:
-
-```bash
-mkdir -p data/backups data/ssh secrets letsencrypt
-chmod 700 data data/backups data/ssh secrets
-openssl rand -base64 36 > secrets/admin_password
-chmod 600 secrets/admin_password
-touch letsencrypt/acme.json
-chmod 600 letsencrypt/acme.json
-docker compose up -d --build
-```
-
-## Operations
-
-Show the original installation summary:
+اطلاعات نصب فقط برای root در این فایل نیز ذخیره می‌شود:
 
 ```bash
 sudo cat /opt/ssh-vpn-panel/install-summary.txt
 ```
 
-Stop Rahban while preserving all persistent data:
+### آزمایش ضروری پس از نصب
+
+نشست فعلی SSH را نبندید. از یک ترمینال دوم اتصال مدیریت را آزمایش کنید:
+
+```bash
+ssh -p 2222 root@SERVER_IP
+```
+
+مشتری ساخته‌شده در پنل از این مسیر وصل می‌شود:
+
+```bash
+ssh -p 22 CUSTOMER_USERNAME@SERVER_IP
+```
+
+کانفیگ آماده NPV Tunnel نیز به‌طور خودکار با IP سرور، پورت `22`، نام کاربری و رمز همان مشتری ساخته می‌شود.
+
+### بازگردانی
+
+برای توقف پنل، حفظ اطلاعات و بازگرداندن SSH مدیریتی قبلی:
 
 ```bash
 sudo /opt/ssh-vpn-panel/rollback.sh
 ```
 
-Start it again:
+توجه: پس از rollback، اتصال مدیریت دوباره طبق تنظیمات قبلی سرور—معمولاً پورت ۲۲—خواهد بود. هنگام اجرای rollback نیز کنسول اضطراری در دسترس باشد.
+
+### امکانات اصلی
+
+- نقش مالک، نماینده و زیرنماینده
+- اختصاص اعتبار حجمی و تاریخ انقضا به نمایندگان
+- محدودیت حجم، زمان و ۱ تا ۱۰۰ اتصال هم‌زمان
+- نمایش مصرف، کاربر آنلاین، آخرین IP و تاریخ شمسی
+- ساخت، ویرایش و حذف پلن‌های فروش
+- دکمه‌های افزایش سریع زمان، حجم و تعداد اتصال
+- کپی IP، پورت، نام کاربری، رمز و کانفیگ `npvt-ssh://`
+- ربات اختیاری تلگرام برای فروش، تست، سفارش و تغییر رمز
+- گزارش رویدادها و پشتیبان‌گیری محافظت‌شده
+
+هیچ بک‌دور، پورسانت اجباری، ارسال اطلاعات، حساب سازنده یا دسترسی مخفی در پروژه وجود ندارد.
+
+نظرات، پیشنهادها و بازخورد: [rahbanssh@gmail.com](mailto:rahbanssh@gmail.com)
+
+---
+
+## English guide
+
+Rahban SSH is a Persian-first, responsive panel for managing SSH Tunnel accounts. Customer Linux users exist only inside an isolated Docker container and do not receive access to the VPS host.
+
+### Port layout
+
+- `22/tcp`: customer SSH Tunnel connections
+- `2222/tcp`: VPS administration (`root` or another host administrator)
+- `80/tcp` and `443/tcp`: web panel and automatic TLS
+- `127.0.0.1:19080`: loopback-only emergency panel endpoint
+
+Port 22 may be reachable on networks that restrict uncommon ports, but this is not guaranteed. Rahban creates a dedicated management SSH service on port 2222, stops the original host listener, and then publishes the isolated customer container on port 22.
+
+### Critical prerequisites
+
+1. Allow inbound TCP `22`, `2222`, `80`, and `443` in the VPS provider firewall.
+2. Confirm that the provider's emergency/VNC console works.
+3. Keep the current SSH session open until a second management login succeeds.
+4. Prefer a fresh VPS for the first installation.
+
+### One-line installation
+
+Run as root on a public `apt`- or `dnf`-based VPS:
 
 ```bash
-cd /opt/ssh-vpn-panel && sudo docker compose up -d
+curl -fsSL https://raw.githubusercontent.com/rahbanssh/rahbanssh/main/install.sh | sudo env RAHBAN_MOVE_HOST_SSH=1 bash
 ```
 
-Before production use, review [DEPLOYMENT.md](DEPLOYMENT.md) and
-[SECURITY.md](SECURITY.md).
+After installation, test management access from a second terminal before closing the first:
 
-## License
+```bash
+ssh -p 2222 root@SERVER_IP
+```
 
-MIT — see [LICENSE](LICENSE).
+Customer accounts created by the panel connect to:
+
+```bash
+ssh -p 22 CUSTOMER_USERNAME@SERVER_IP
+```
+
+The installer detects the public IPv4 address, creates an `sslip.io` hostname, installs Docker if needed, obtains a Let's Encrypt certificate, starts the panel and isolated SSH service, creates a zero-state SQLite database and random secrets, and prints the panel URL and credentials.
+
+The root-only installation summary is available at:
+
+```bash
+sudo cat /opt/ssh-vpn-panel/install-summary.txt
+```
+
+Stop Rahban, preserve its database, and restore the previous host SSH service with:
+
+```bash
+sudo /opt/ssh-vpn-panel/rollback.sh
+```
+
+Main features include owner/reseller/child-reseller roles, delegated traffic credit, quota and expiry enforcement, concurrent-connection limits, Jalali dates, editable sales plans, live usage, copyable SSH/NPV configurations, optional Telegram sales bots, audit logs, and protected backups.
+
+There is no commission, backdoor, credential reporting, creator account, or hidden remote-access mechanism.
+
+Feedback and suggestions: [rahbanssh@gmail.com](mailto:rahbanssh@gmail.com)
+
+See [DEPLOYMENT.md](DEPLOYMENT.md) and [SECURITY.md](SECURITY.md) before production use. Licensed under the [MIT License](LICENSE).

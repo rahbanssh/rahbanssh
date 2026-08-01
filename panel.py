@@ -2084,7 +2084,9 @@ def page(title: str, body: str, session: dict[str, object] | None = None) -> str
     <style>{STYLE}</style><script src="/app.js" defer></script></head><body><main>
     <div class="top"><div><h1>{html.escape(panel_title())}</h1>
     {f'<span class="role">{role} · {html.escape(str(session["u"]))}</span>' if session else ''}</div>{nav}</div>{body}
-    </main></body></html>"""
+    <footer class="muted" style="text-align:center;margin:2rem 0 1rem">
+      پیشنهاد و بازخورد: <a dir="ltr" href="mailto:rahbanssh@gmail.com">rahbanssh@gmail.com</a>
+    </footer></main></body></html>"""
 
 
 def customer_config(username: str, password: str) -> str:

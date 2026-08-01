@@ -3,8 +3,9 @@
 ## Reporting a vulnerability
 
 Do not publish exploit details, credentials, tokens, IP addresses, database
-copies, or user records in a public issue. Open a minimal issue asking the
-maintainer for a private reporting channel, without including sensitive data.
+copies, or user records in a public issue. Send a minimal report to
+[rahbanssh@gmail.com](mailto:rahbanssh@gmail.com) without including live
+credentials or personal customer data.
 
 ## Operator responsibilities
 
@@ -17,6 +18,8 @@ maintainer for a private reporting channel, without including sensitive data.
 - Never publish `panel.db`, `session_secret`, `admin_password`, SSH host keys,
   backup archives, or installation summaries.
 - Test restores and management access before changing any SSH listener.
+- Allow and verify TCP 2222 through the provider firewall before installing;
+  retain emergency console access while moving host SSH.
 
 ## Trust boundaries
 

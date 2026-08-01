@@ -28,7 +28,7 @@ services:
     container_name: ssh-vpn-panel
     restart: unless-stopped
     ports:
-      - "${CUSTOMER_SSH_BIND:-0.0.0.0}:${CUSTOMER_SSH_PORT:-2222}:22/tcp"
+      - "${CUSTOMER_SSH_BIND:-0.0.0.0}:${CUSTOMER_SSH_PORT:-22}:22/tcp"
       - "127.0.0.1:${PANEL_HOST_PORT:-19080}:8080/tcp"
     volumes:
       - ./data:/data
@@ -40,7 +40,7 @@ services:
       PANEL_PUBLIC_URL: "https://${PANEL_PUBLIC_HOST}"
       PANEL_REQUIRE_TOTP: "${PANEL_REQUIRE_TOTP:-false}"
       CUSTOMER_PUBLIC_HOST: "${CUSTOMER_PUBLIC_HOST}"
-      CUSTOMER_PUBLIC_PORT: "${CUSTOMER_SSH_PORT:-2222}"
+      CUSTOMER_PUBLIC_PORT: "${CUSTOMER_SSH_PORT:-22}"
       ACCOUNTING_INTERVAL_SECONDS: "2"
     labels:
       - "traefik.enable=true"
